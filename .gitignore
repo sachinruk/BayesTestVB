@@ -1,0 +1,13 @@
+.dropbox
+*.tar.gz
+*.pdf
+*.out
+*.bbl
+*.blg
+*.log
+nlopt-2.3/
+*.aux
+*.synctex.gz
+*.tgz
+*.*~
+*.mat

@@ -1,0 +1,101 @@
+\documentclass{article}
+\input{eqn_abbr}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{breqn}
+
+\begin{document}
+\section{Approximate posteriors}
+\begin{align}
+\nonumber p(t_i=1|\cx_i,\cbeta)&=\int \delta(y_i>0)\cN(y_i|\cx_i\cbeta,1_)\,dy_i\\
+\nonumber p(t_i=0|\cx_i,\cbeta)&=\int \delta(y_i<0)\cN(y_i|\cx_i\cbeta,1_)\,dy_i\\
+p(t_i,y_i|\cx_i,\cbeta)&=\delta(y_i>0)^{t_i}\delta(y_i<0)^{1-t_i}\cN(y_i|\cx_i\cbeta,1)
+\end{align}
+Assume that $\cbeta$ has a non-informative prior of $\cN(\cbeta|\czero,1000\cI)$.
+
+\begin{align}
+p(\ct,\cy,\cbeta)&=\cN(\cbeta|\czero,1000\cI)\prod_{i=1}^{N}\delta(y_i>0)^{t_i}\delta(y_i<0)^{1-t_i}\cN(y_i|\cx_i\cbeta,1)
+\end{align}
+
+The approximate posterior on $\cbeta$ is shown below (\eqref{qb}). Let $\cX=\{\cx_1,\cx_2,...,\cx_n\}$.
+\begin{align}
+\nonumber\log q(\cbeta)&=\log \cN(\cbeta|\czero,1000\cI)-\chalf{}\csum(y_i-\cx_i^T\cbeta)^2\\
+\nonumber&=-\chalf{}\clrbracket{\frac{\cbeta^T\cbeta}{1000}+\cbeta^T\cX\cX^T\cbeta-2\clrangle{\cy}^T\cX^T\cbeta}\\
+\therefore q(\cbeta)&=\cN(\cmu,\cSigma)\\
+\label{eq:qb}
+\cSigma&=\clrbracket{\cX\cX^T+\frac{1}{1000}\cI}^{-1}\\
+\cmu&=\cSigma\cX\clrangle{\cy}
+\end{align}
+
+\begin{align}
+\nonumber\log q(y_i)&=t_i\log \delta(y_i>0)+(1-t_i)\log \delta(y_i<0)-\chalf{}(y_i-2y_i\cx_i^T\clrangle{\cbeta})\\
+q(y_i)&=\cN_{t_i}(y_i|\cx_i^T\cmu,1)
+\end{align}
+Where $\cN_{t_i}$ is a left/right truncated normal distribution depending on $t_i=0$, $t_i=1$ respectively. The required expectations, $E(y_i)$, $E(y_i^2)$ are shown below.
+
+\begin{align}
+\nonumber C_i&=\begin{cases}
+\int_{-\infty}^{0}\exp(-\chalf{}(y_i-\cx_i^T\cmu)^2)\,dy_i & t_i=0\\
+\int_{0}^{\infty}\exp(-\chalf{}(y_i-\cx_i^T\cmu)^2)\,dy_i & t_i=1\\
+\end{cases}\\
+&=\begin{cases}
+\sqrt{2\pi}\Phi(-\cx_i^T\cmu) & t_i=0\\
+\sqrt{2\pi}(1-\Phi(-\cx_i^T\cmu)) & t_i=1\\
+\end{cases}\\
+\nonumber E(y_i)&=\begin{cases}
+\int_{-\infty}^{0}y_i\frac{1}{C_i}\exp\clrbracket{-\chalf{}(y-\cx_i^T\cmu)^2}\,dy_i & t_i=0\\
+\int_{0}^{\infty}y_i\frac{1}{C_i}\exp\clrbracket{-\chalf{}(y-\cx_i^T\cmu)^2}\,dy_i & t_i=1
+\end{cases}\\
+&=\begin{cases}
+-\frac{1}{C_i}\exp\clrbracket{-\chalf{}(\cx_i^T\cmu)^2}+\cx_i^T\cmu & t_i=0\\
+\frac{1}{C_i}\exp\clrbracket{-\chalf{}(\cx_i^T\cmu)^2}+\cx_i^T\cmu & t_i=1
+\end{cases}\\
+\nonumber E(y_i^2)&=\begin{cases}
+-\frac{\cx_i^T\cmu\exp\clrbracket{-\chalf{}(\cx_i^T\cmu)^2}}{C_i}+(\cx_i^T\cmu)^2+1 & t_i=0\\
+\frac{\cx_i^T\cmu\exp\clrbracket{-\chalf{}(\cx_i^T\cmu)^2}}{C_i}+(\cx_i^T\cmu)^2+1 & t_i=1
+\end{cases}
+\end{align}
+
+\section{Log Likelihood}
+In this section a lower bound for the log likelihood is obtained using the approximate distributions. Let $\delta_{t_i}(y_i)=\delta(y_i>0)^{t_i}\delta(y_i<0)^{1-t_i}$
+\begin{align}
+\nonumber \clrangle{\log p(\cy,\cbeta,\ct)}=&\csum\log\delta_{t_i}(y_i)\cN(y_i|\cx_i^T\cbeta,1)-\frac{d}{2}\log(2\pi\times1000)-\chalf{}\times\frac{1}{1000}\clrangle{\cbeta^T\cbeta}\\
+\nonumber =&-\frac{N}{2}\log(2\pi)-\chalf{}\csum\clrbracket{ E(y_i^2)-2E(y_i)\cx_i^T\cmu+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\nonumber &-\frac{d}{2}\log(2\pi\times1000)-\chalf{}\times\frac{1}{1000}(\cmu^T\cmu+Tr(\cSigma))\\
+\nonumber=&-\frac{N+d}{2}\log 2\pi-\frac{d}{2}\log 1000-\chalf{}\times\frac{1}{1000}(\cmu^T\cmu+Tr(\cSigma))\\
+&-\chalf{}\csum\clrbracket{(-1)^{t_i}\frac{\cx_i^T\cmu\exp(-\chalf{}(\cx_i^T\cmu)^2)}{C_i}+1+\cx_i^T\cSigma\cx_i}
+\end{align}
+
+\begin{align}
+\nonumber\clrangle{\log q(\cbeta)}=&-\chalf{}\log 2\pi|\cSigma|-\chalf{}(\cbeta-\cmu)^T\cSigma^{-1}(\cbeta-\cmu)\\
+&=-\frac{d}{2}\log(2\pi)-\chalf{}\log|\cSigma|-\frac{d}{2}
+\end{align}
+
+\begin{align}
+\nonumber\clrangle{\log q(y_i)}=&-\log C_i-\chalf{}\clrangle{(y_i^2-2\cx_i^T\cmu y_i+(\cx_i^T\cmu)^2)}\\
+=&-\log C_i-\chalf{}\clrbracket{(-1)^{t_i}\frac{\cx_i^T\cmu\exp(-\chalf{}(\cx_i^T\cmu)^2)}{C_i}+1}
+\end{align}
+\appendix
+
+\section{Expectations}
+For $t_i=1$.
+\begin{align}
+\nonumber E(y^2)&=\int_{0}^{\infty}y^2\frac{1}{C_i}\exp\clrbracket{-\chalf{}(y-\mu)^2}\,dy \\
+\nonumber \text{let }z=y-\mu \qquad E(y^2)&=\frac{1}{C_i}\int_{-\mu}^{\infty}z^2\exp\clrbracket{-\chalf{}z^2}dz+2\mu E(y)-\mu^2\\
+\nonumber \text{let } u&=z\qquad dv=z\exp\clrbracket{-\chalf{}z^2}\\
+\nonumber du&=dz \qquad v=-\exp\clrbracket{-\chalf{}z^2}\\
+\nonumber \frac{1}{C_i}\int_{-\mu}^{\infty}z^2\exp\clrbracket{-\chalf{}z^2}dz &=\frac{-z\exp\clrbracket{-\chalf{}z^2}}{C_i}\Bigg|_{-\mu}^\infty+\frac{1}{C_i}\int_{-\mu}^{\infty}\exp\clrbracket{-\chalf{}z^2}\,dz\\
+\nonumber &=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}+1\\
+\nonumber E(y^2)&=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}+1+\mu^2+\frac{2\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}\\
+&=\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}+\mu^2+1
+\end{align}
+Similarly for $t_i=0$,
+\begin{align}
+\nonumber E(y^2)&=\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}+1+2\mu E(y)-\mu^2\\
+&=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_i}+\mu^2+1
+\end{align}
+
+\end{document}

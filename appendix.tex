@@ -1,0 +1,196 @@
+\clearpage
+\begin{appendices}
+
+
+\section{Approximate Posteriors for Quantile Regression Case}
+This section on deriving approximate posteriors on the latent variables for quantile regression is a novel contribution. The Bayesian hierarchy required for this section is shown in \eqref{BFVQ_hier}.
+
+\subsection{ $q(\beta)$}
+\label{sec:q_beta}
+Approximate posterior on $\cbeta$ and relevant expectations
+\begin{align}
+\nonumber
+\log q(\cbeta)&=\clrangle{-\chalf{}\frac{\caexp}{2\sigma^2}\csum\frac{1}{w_i}\clrbracket{\cbeta^T \cx_t+\frac{1-2\alpha}{\caexp}\sigma w_t-y_t}^2}_{q(w_t)q(\sigma)}\\
+\nonumber
+&\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\chalf{}\times\frac{1}{1000}\cbeta^T\cbeta\\
+\nonumber
+&=-\chalf{}\Biggl[\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cx_t\cx_t^T+\frac{1}{1000}\cI}\cbeta\\
+\nonumber
+&-2\clrbracket{\csum\left[\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}\right]\cx_t^T}\cbeta\Biggr]\\
+\therefore q(\cbeta)&\sim\cN(\cmu,\cSigma)\\
+\cSigma &=\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cx_t\cx_t^T+\frac{1}{1000}\cI}^{-1}\\
+\cmu&=\cSigma\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_t}\\
+\clrangle{\cbeta}&=\cmu\\
+\clrangle{\cbeta\cbeta^T}&=\cSigma+\cmu\cmu^T
+\end{align}
+
+\subsection{ $q(\cw)$}
+Approximate posterior on $w_i$ and relevant expectations.
+\begin{align}
+\nonumber
+\log (q(w_i))&=-w_i-\chalf{}\log(w_i)\\
+\nonumber
+&\qquad\qquad\quad-\chalf{}\clrangle{\frac{\caexp}{2\sigma^2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(\sigma)}\\
+\nonumber
+&=-w_i-\chalf{}\log(w_i)\\
+\nonumber&-\chalf{}\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\nonumber
+&=-\chalf{}\log(w_i)\\
+\nonumber&-\chalf{}\clrbracket{\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\therefore q(w_i) & = \cGIG\clrbracket{\chalf{},\alpha,\beta}\\
+\alpha_i & =\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2} \\
+\beta_i & = \frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\clrangle{\frac{1}{w_i}}&=\sqrt{\frac{\alpha_i}{\beta_i}}\\
+\clrangle{w_i}&=\sqrt{\frac{\beta_i}{\alpha_i}}+\frac{1}{\alpha_i}
+\end{align}
+
+\subsection{$q(\sigma)$}
+\label{sec:q_sigma}
+Approximate posterior on $\sigma$ and relevant expectations.
+\begin{align}
+\nonumber \log q(\sigma) & =-\frac{N}{2}\log \sigma^2-\chalf{}\csum\clrangle{\frac{\caexp}{2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(w_i)}\frac{1}{\sigma^2}\\
+\nonumber &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\log \sigma\\
+\nonumber &=-(N+1)\log \sigma-\gamma\frac{1}{\sigma}-\delta\frac{1}{\sigma^2}\\
+\gamma &= -{\frac{1-2\alpha}{2}\csum(y_i-\cx_i^T\clrangle{\cbeta})}\\
+\delta &=\frac{\caexp}{4}\csum\clrangle{\frac{1}{w_i}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\clrangle{\frac{1}{\sigma}}&=\frac{N}{\sqrt{2\delta}}\,\frac{U(N+\chalf{},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}\\
+\clrangle{\frac{1}{\css}}&=\frac{N(N+1)}{2\delta}\,\frac{U(N+\frac{3}{2},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}
+\end{align}
+
+However, the above approximate posterior on $q(\sigma)$ suffers from numerical problems due to calculations of the parabolic cylindrical function. Hence, we shall restrict $q(\cbeta)=IG(a,b)$. VB requires the maximisation of the lower bound $F(q)$ which can be expressed as $-KL(q_j||\tilde{p})-\sum_{i\ne j}\int q_i\log q_i dz$ where $\log\tilde{p}=\int \log p(\cy,\cz)\prod_{i\ne j}(q_i dz_i)$. Thus we are required to maximise,
+
+\begin{align}
+\nonumber F_\sigma=&=-(N+1)\clrangle{\log \sigma}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\sigma^2}}-\int q(\sigma)\log q(\sigma)\,d\sigma\\
+\nonumber \clrangle{\frac{1}{\sigma}}&=\frac{a}{b} \qquad\qquad \clrangle{\frac{1}{\css}}=\frac{a(a+1)}{b^2} \qquad \clrangle{\log \sigma}=\log b -\psi(a)\\
+\therefore F_\sigma&=(a-N)(\log b-\psi(a))+(b-\gamma)\frac{a}{b}-\delta \frac{a(a+1)}{b^2}-a\log b+\log \Gamma(a)\\
+\frac{\partial F}{\partial a}&=(N-a)\psi^{(1)}(a)-\frac{\gamma}{b}-\frac{\delta(2a+1)}{b^2}+1\\
+\frac{\partial F}{\partial b}&=-\frac{N}{b}+\frac{\gamma a}{b^2}+\frac{2\delta a(a+1)}{b^3}
+\end{align}
+Thus $F_\sigma$ is maximised using a numerical optimiser which employs the given derivatives.
+
+\subsection{Lower Bound for Log Likelihood}
+\label{sec:l_bound}
+Using the EM algorithm it can be shown that $\int q(\cz)\log p(\cy,\cz)-q(\cz)\log q(\cz)\,d\cz$ is a lower bound to the log data likelihood where, $\cz$ are the latent variables. The first term $\int q(\cz)\log p(\cy,\cz)d\cz$ can be shown to be,
+\begin{align}
+\nonumber
+&=-\chalf{}\Biggl[N\log\frac{4\pi}{\caexp}+\csum\clrangle{\log w_i} +2(N+1)\clrangle{\log\sigma}+D\log (2\pi\times1000)\\
+\nonumber&+\clrangle{\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cx_i\cx_i^T+\frac{1}{1000}\cI}\cbeta}\\
+\nonumber
+&-2\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_i^T}\clrangle{\cbeta}\\
+\nonumber
+&+\frac{\caexp}{2}\clrangle{\frac{1}{\css}}\csum\clrangle{\frac{1}{w_i}}y_i^2+\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}\csum\clrangle{w_i}-(1-2\alpha)\clrangle{\frac{1}{\sigma}}\csum y_i\Biggr]\\
+\nonumber&=-\chalf{}\Biggl[N\log\frac{4\pi}{\caexp}+\csum\clrangle{\log w_i} +2(N+1)(\log b -\psi(a))+D\log (2\pi\times1000)\\
+\nonumber&+D-\cmu^T\cSigma^{-1}\cmu+\frac{\caexp}{2}\frac{a(a+1)}{b^2}\sum_{i=1}^{N}\sqrt{\frac{\alpha_i}{\beta_i}}y_i^2+\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}\csum\clrbracket{\sqrt{\frac{\beta_i}{\alpha_i}}+\frac{1}{\alpha_i}}\\
+&-(1-2\alpha)\frac{a}{b}\csum y_i\Biggr]
+\end{align}
+
+The second term $\int q(z)\log q(z)dz$ can be shown to be,
+\begin{align}
+\nonumber&-\chalf{}\Biggl[D\log(2\pi)+\log |\cSigma|+\clrangle{\cbeta^T\cSigma^{-1}\cbeta}-2\cmu^T\cSigma^{-1}\clrangle{\cbeta}+\cmu^T\cSigma^{-1}\cmu\Biggr]\\
+&\nonumber+\frac{1}{4}\csum(\log\alpha_i-\log\beta_i)-N\log 2- \csum\log\cBess_{1/2}\clrbracket{\sqrt{\alpha_i\beta_i}}\\
+\nonumber&-\chalf{}\csum\Biggl[\clrangle{\log w_i} +\alpha_i\clrangle{w_i}+\beta_i\clrangle{\frac{1}{w_i}}\Biggr]\\
+%\nonumber&+\frac{N-2}{2}\log 2\delta-\log U\clrbracket{N-\frac{5}{2},\frac{\gamma}{\sqrt{2\delta}}}-\log \Gamma(N-2)-\clrbracket{\frac{\gamma^2}{8\delta}}\\
+%\nonumber&-(N+1)\clrangle{\log\sigma}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\css}}\\
+&\nonumber +a\log b - \log \Gamma(a)-(a+1)\clrangle{\log \sigma}-b\clrangle{\frac{1}{\sigma}}
+\\ \nonumber=&-\chalf{}\clrbracket{D+D\log2\pi+\log|\cSigma|}-\frac{N}{2}\log 2-\frac{N}{2}\log\pi+\chalf{}\csum\log\alpha_i+\sqrt{\alpha_i\beta_i}\\
+\nonumber&-\chalf{}\csum\Biggl[\clrangle{\log w_i} +2\sqrt{\alpha_i\beta_i}+1\Biggr]+a\log b -\log \Gamma(a)-(a+1)(\log b-\psi(a))-a\\
+&\nonumber=-\chalf{}\clrbracket{D+D\log2\pi+\log|\cSigma|}-\frac{N}{2}\log 2-\frac{N}{2}\log\pi+\chalf{}\csum\log\alpha_i-\frac{N}{2}\\
+&-\chalf{}\csum\Biggl[\clrangle{\log w_i}\Biggr]-\log \Gamma(a)-\log b+a\psi(a)+\psi(a)-a
+%\nonumber&+\frac{N-2}{2}\log 2\delta-\log U\clrbracket{N-\frac{5}{2},\frac{\gamma}{\sqrt{2\delta}}}-\log \Gamma(N-2)-\clrbracket{\frac{\gamma^2}{8\delta}}\\
+%\nonumber&-(N+1)\clrangle{\log\sigma}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\css}}
+\end{align}
+
+\section{Approximate Posteriors for Classification Case}
+This is an adaptation of the work done by Girolami and Rogers (2006). The Bayesian hierarchy is as follows:
+\begin{align}
+\nonumber p(\cI_t|\cW_t,\cbeta)&=\Phi^{\cI_t}(\cW_t^T\cbeta)(1-\Phi(\cW_t^T\cbeta))^{1-\cI_t}\\
+\nonumber p(\cbeta) & = \cN(0,1000\cI)
+\end{align}
+The Bernoulli distribution over $\cI_t$ can be restated using a latent variable $y_t$,
+\begin{align}
+\nonumber p(\cI_t=1|\cW_t,\cbeta)&=\int \delta(y_t>0)\cN(y_t|\cW_t\cbeta,1_)\,dy_t\\
+\nonumber p(\cI_t=0|\cW_t,\cbeta)&=\int \delta(y_t<0)\cN(y_t|\cW_t\cbeta,1_)\,dy_t\\
+p(\cI_t,y_t|\cW_t,\cbeta)&=\delta(y_t>0)^{\cI_t}\delta(y_t<0)^{1-\cI_t}\cN(y_t|\cW_t\cbeta,1)
+\end{align}
+
+\subsection{$q(\beta)$}
+\label{sec:class_beta}
+Approximate posterior on $q(\beta)$ and relevant expectations,
+\begin{align}
+\nonumber\log q(\cbeta)&=\log \cN(\cbeta|\czero,1000\cI)-\chalf{}\sum_{t=1}^{N}(\cy_t-\cW_t^T\cbeta)^2\\
+\nonumber&=-\chalf{}\clrbracket{\frac{\cbeta^T\cbeta}{1000}+\cbeta^T\cW\cW^T\cbeta-2\clrangle{\cy}^T\cW^T\cbeta}+const\\
+\therefore q(\cbeta)&=\cN(\cmu,\cSigma) \label{eq:qb}\\
+\cSigma&=\clrbracket{\cW\cW^T+\frac{1}{1000}\cI}^{-1}\\
+\cmu&=\cSigma\cW\clrangle{\cy}
+\end{align}
+
+\subsection{$q(\cy_t)$}
+\label{sec:class_y}
+\begin{align}
+\nonumber\log q(y_t)&=\cI_t\log \delta(y_t>0)+(1-\cI_t)\log \delta(y_t<0)-\chalf{}(y_t-2y_t\cW_t^T\clrangle{\cbeta})+const\\
+q(y_t)&=\cN_{\cI_t}(y_i|\cW_t^T\cmu,1)
+\end{align}
+Where $\cN_{\cI_t}$ is a left/right truncated normal distribution depending on ${\cI_t}=0$, ${\cI_t}=1$ respectively. The required expectations, $E(y_t)$, $E(y_t^2)$ are shown below. Due to the iterative nature of VB expectations of $q(\cy)$ is required to obtain the posterior on $q(\beta)$. Therefore, the normalising constant, the mean $E(\cy_t)$ as well as $E(\cy_t^2)$ (which can be used to find the variance) is shown below,
+
+\begin{align}
+\nonumber C_t&=\begin{cases}
+\int_{-\infty}^{0}\exp(-\chalf{}(y_t-\cW_t^T\cmu)^2)\,dy_t & \cI_t=0\\
+\int_{0}^{\infty}\exp(-\chalf{}(y_t-\cW_t^T\cmu)^2)\,dy_t & \cI_t=1\\
+\end{cases}\\
+&=\begin{cases}
+\sqrt{2\pi}\Phi(-\cW_t^T\cmu) & \cI_t=0\\
+\sqrt{2\pi}(1-\Phi(-\cW_t^T\cmu)) & \cI_t=1\\
+\end{cases}\\
+\nonumber E(y_t)&=\begin{cases}
+\int_{-\infty}^{0}y_t\frac{1}{C_t}\exp\clrbracket{-\chalf{}(\cy-\cW_t^T\cmu)^2}\,dy_t & \cI_t=0\\
+\int_{0}^{\infty}y_t\frac{1}{C_t}\exp\clrbracket{-\chalf{}(\cy-\cW_t^T\cmu)^2}\,dy_t & \cI_t=1
+\end{cases}\\
+&=\begin{cases}
+-\frac{1}{C_t}\exp\clrbracket{-\chalf{}(\cW_t^T\cmu)^2}+\cW_t^T\cmu & \cI_t=0\\
+\frac{1}{C_t}\exp\clrbracket{-\chalf{}(\cW_t^T\cmu)^2}+\cW_t^T\cmu & \cI_t=1
+\end{cases}\\
+\nonumber E(y_t^2)&=\begin{cases}
+-\frac{\cW_t^T\cmu\exp\clrbracket{-\chalf{}(\cW_t^T\cmu)^2}}{C_t}+(\cW_t^T\cmu)^2+1 & \cI_t=0\\
+\frac{\cW_t^T\cmu\exp\clrbracket{-\chalf{}(\cW_t^T\cmu)^2}}{C_t}+(\cW_t^T\cmu)^2+1 & \cI_t=1
+\end{cases}
+\end{align}
+
+The method in which $E(\cy_t^2)$ is obtained for a general truncated Gaussian is shown below. 
+
+For $\cI_t=1$.
+\begin{align}
+\nonumber E(\cy_t^2)&=\int_{0}^{\infty}\cy_t^2\frac{1}{C_t}\exp\clrbracket{-\chalf{}(\cy_t-\mu)^2}\,dy \\
+\nonumber \text{let }z=\cy_t-\mu \qquad E(\cy_t^2)&=\frac{1}{C_t}\int_{-\mu}^{\infty}z^2\exp\clrbracket{-\chalf{}z^2}dz+2\mu E(\cy_t)-\mu^2\\
+\nonumber \text{let } u=z\qquad dv=z\exp\clrbracket{-\chalf{}z^2} &\qquad \therefore du=dz \qquad v=-\exp\clrbracket{-\chalf{}z^2}\\
+\nonumber \frac{1}{C_t}\int_{-\mu}^{\infty}z^2\exp\clrbracket{-\chalf{}z^2}dz &=\frac{-z\exp\clrbracket{-\chalf{}z^2}}{C_t}\Bigg|_{-\mu}^\infty+\frac{1}{C_t}\int_{-\mu}^{\infty}\exp\clrbracket{-\chalf{}z^2}\,dz\\
+\nonumber &=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}+1\\
+\nonumber E(\cy_t^2)&=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}+1+\mu^2+\frac{2\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}\\
+&=\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}+\mu^2+1
+\end{align}
+Similarly for $\cI_t=0$,
+\begin{align}
+\nonumber E(\cy_t^2)&=\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}+1+2\mu E(\cy_t)-\mu^2\\
+&=-\frac{\mu\exp\clrbracket{-\chalf{}\mu^2}}{C_t}+\mu^2+1
+\end{align}
+
+
+
+\subsection{Lower Bound for Log Likelihood}
+\label{sec:class_lik}
+In this section a lower bound for the log likelihood is obtained as was done for the quantile regression case using the approximate distributions. Using the EM algorithm, the term, $\int q(\cy)q(\beta)(\log p(\cy,\beta,\cI)-\log q(\cy)q(\beta)) d\beta d\cy$ forms a lower bound to the log likelihood. Let $\delta_{\cI_t}(y_t)=\delta(y_t>0)^{\cI_t}\delta(y_t<0)^{1-\cI_t}$.
+\begin{align}
+\nonumber \clrangle{\log p(\cy,\cbeta,\ct)}=&\csum\log\delta_{\cI_t}(y_t)\cN(y_t|\cW_t^T\cbeta,1)-\frac{d}{2}\log(2\pi\times1000)-\chalf{}\times\frac{1}{1000}\clrangle{\cbeta^T\cbeta}\\
+\nonumber =&-\frac{N}{2}\log(2\pi)-\chalf{}\csum\clrbracket{ E(y_t^2)-2E(y_t)\cW_t^T\cmu+\cW_t^T\clrangle{\cbeta\cbeta^T}\cW_t}\\
+\nonumber &-\frac{d}{2}\log(2\pi\times1000)-\chalf{}\times\frac{1}{1000}(\cmu^T\cmu+Tr(\cSigma))\\
+\nonumber=&-\frac{N+d}{2}\log 2\pi-\frac{d}{2}\log 1000-\chalf{}\times\frac{1}{1000}(\cmu^T\cmu+Tr(\cSigma))\\
+&-\chalf{}\csum\clrbracket{(-1)^{\cI_t}\frac{\cW_t^T\cmu\exp(-\chalf{}(\cW_t^T\cmu)^2)}{C_t}+1+\cW_t^T\cSigma\cW_t}\\
+\nonumber\clrangle{\log q(\cbeta)}=&-\chalf{}\log 2\pi|\cSigma|-\chalf{}(\cbeta-\cmu)^T\cSigma^{-1}(\cbeta-\cmu)\\
+&=-\frac{d}{2}\log(2\pi)-\chalf{}\log|\cSigma|-\frac{d}{2}\\
+\nonumber\clrangle{\log q(y_t)}=&-\log C_t-\chalf{}\clrangle{(y_t^2-2\cW_t^T\cmu y_t+(\cW_t^T\cmu)^2)}\\
+=&-\log C_t-\chalf{}\clrbracket{(-1)^{\cI_t}\frac{\cW_t^T\cmu\exp(-\chalf{}(\cW_t^T\cmu)^2)}{C_t}+1}
+\end{align}
+Thus, the lower bound is as follows:
+\begin{align}
+=&-\chalf{}\clrbracket{N\log 2\pi+d\log 1000+\frac{\cmu^T\cmu+Tr(\cSigma)}{1000}+\sum_{t=1}^{N}\cW_t^T\cSigma\cW_t-d-\log|\cSigma|-\sum_{t=1}^{N}\log C_t}
+\end{align}
+\end{appendices}

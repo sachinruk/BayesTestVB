@@ -1,0 +1,151 @@
+\documentclass{article}
+\input{eqn_abbr}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{breqn}
+
+\begin{document}
+
+\section{Bayesian derivation}
+\begin{align}
+p(y_i|\cbeta,w_i,\sigma,\alpha)&=\cN\clrbracket{\cbeta^T\cx_i+\frac{1-2\alpha}{\alpha(1-\alpha)}\sigma w_i,\frac{2}{\alpha(1-\alpha)}\sigma^2 w_i}\\
+p(\cbeta)&=\cN(0,1000\cI)\\
+p(w_i)&=\exp(-w_i)\\
+p(\sigma)&\propto\frac{1}{\sigma}
+\end{align}
+
+\section{Variational Bayes Factors}
+$\cbeta$ and relevant expectations
+\begin{align}
+\nonumber
+\log q(\cbeta)&=\clrangle{-\chalf{}\frac{\caexp}{2\sigma^2}\csum\frac{1}{w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(w_i)q(\sigma)}\\
+\nonumber
+&\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\chalf{}\times\frac{1}{1000}\cbeta^T\cbeta\\
+\nonumber
+&=-\chalf{}\Biggl[\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cx_i\cx_i^T+\frac{1}{1000}\cI}\cbeta\\
+\nonumber
+&-2\clrbracket{\csum\left[\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}\right]\cx_i^T}\cbeta\Biggr]\\
+\therefore q(\cbeta)&\sim\cN(\cmu,\cSigma)\\
+\cSigma &=\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cx_i\cx_i^T+\frac{1}{1000}\cI}^{-1}\\
+\cmu&=\cSigma\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_i}\\
+\clrangle{\cbeta}&=\cmu\\
+\clrangle{\cbeta\cbeta^T}&=\cSigma+\cmu\cmu^T
+\end{align}
+
+$w_i$ and relevant expectations.
+\begin{align}
+\nonumber
+\log (q(w_i))&=-w_i-\chalf{}\log(w_i)\\
+\nonumber
+&\qquad\qquad\quad-\chalf{}\clrangle{\frac{\caexp}{2\sigma^2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(\sigma)}\\
+\nonumber
+&=-w_i-\chalf{}\log(w_i)\\
+\nonumber&-\chalf{}\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\nonumber
+&=-\chalf{}\log(w_i)\\
+\nonumber&-\chalf{}\clrbracket{\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\therefore q(w_i) & = \cGIG\clrbracket{\chalf{},\alpha,\beta}\\
+\alpha_i & =\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2} \\
+\beta_i & = \frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\clrangle{\frac{1}{w_i}}&=\sqrt{\frac{\alpha_i}{\beta_i}}
+\end{align}
+
+$\sigma$ and relevant expectations.
+\begin{align}
+\nonumber \log q(\sigma) & =-\frac{N}{2}\log \sigma^2-\chalf{}\csum\clrangle{\frac{\caexp}{2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(w_i)}\frac{1}{\sigma^2}\\
+\nonumber &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\log \sigma\\
+\nonumber &=-(N+1)\log \sigma-\gamma\frac{1}{\sigma}-\delta\frac{1}{\sigma^2}\\
+\gamma &= -{\frac{1-2\alpha}{2}\csum(y_i-\cx_i^T\clrangle{\cbeta})}\\
+\delta &=\frac{\caexp}{4}\csum\clrangle{\frac{1}{w_i}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\clrangle{\frac{1}{\sigma}}&=\frac{N}{\sqrt{2\delta}}\,\frac{U(N+\chalf{},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}\\
+\clrangle{\frac{1}{\css}}&=\frac{N(N+1)}{2\delta}\,\frac{U(N+\frac{3}{2},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}
+\end{align}
+
+However, the above approximate posterior on $q(\sigma)$ suffers from numerical problems due to calculations of the parabolic cylindrical function. VB requires the maximisation of the lower bound $F(q)$ which can be expressed as $-KL(q_j||\tilde{p})-\sum\int q_i\log q_i dz$ where $\log\tilde{p}=\int \log p(\cy,\cz)\prod_{i\ne j}(q_i dz_i)$. Thus we are required to maximise,
+
+\begin{align}
+content...
+\end{align}
+
+
+%Hence, we shall restrict $q(\cbeta)=IG(a,b)$. Using the fact that $q(\cbeta)=\frac{1}{Z_\cbeta} p(\cbeta)\exp\clrangle{\log p(y|\cbeta,\cw,\sigma)}_{q(\cw)q(\sigma)}$ and $q(\cw)=\frac{1}{Z_\cw} p(\cw)\exp\clrangle{\log p(y|\cbeta,\cw,\sigma)}_{q(\cbeta)q(\sigma)}$, and subsequently substituting into the lower bound we achieve, 
+%\begin{align}
+%\nonumber
+%F&=\int\int\int q(\cbeta)q(\cw)q(\sigma)\log \frac{p(\cy|\cbeta,\cw,\sigma)p(\cbeta)p(\cw)p(\sigma)}{q(\cbeta)q(\cw)q(\sigma)}\\
+%\nonumber &= -KL(q(\sigma)||p(\sigma))+\log Z_\cbeta+\log Z_\cw-\int\int\int q(\cbeta)q(\cw)q(\sigma)\log p(\cy|\cbeta,\cw,\sigma)\\
+%\nonumber &=-\clrangle{\log\sigma}-\clrangle{\log q(\sigma)}+\log Z_\cbeta+\log Z_\cw-\frac{N}{2}\clrangle{\log \css}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\sigma^2}}\\
+%\nonumber &=\log Z_\sigma+\log Z_\cw+\log Z_\cbeta+(a-N)\clrangle{\log \sigma}+(b-\gamma)\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\css}}\\
+%\gamma &= -{\frac{1-2\alpha}{2}\csum(y_i-\cx_i^T\clrangle{\cbeta})}\\
+%\delta &=\frac{\caexp}{4}\csum\clrangle{\frac{1}{w_i}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}
+%\end{align}
+%After ignoring terms that do not depend on the hyper-parameters of $q(\sigma)$, $a,\,b$ we achieve the follwing results,
+%\begin{align}
+%\log Z_\cbeta&=-\chalf{}\sum_{j=1}^{D}\log\clrbracket{\clrangle{\frac{1}{\css}}\sigma_{\Sigma(j)}+\frac{1}{1000}}+const\\
+%\log Z_\cw&=-\chalf{}\log \alpha_i-\csum\sqrt{\alpha_i\beta_i}+const\\
+%\log Z_\sigma&=\log\Gamma(a)-a\log b\\
+%\clrangle{\frac{1}{\sigma}}&=\frac{a}{b}\\
+%\clrangle{\frac{1}{\css}}&=\frac{a(a+1)}{b^2}\\
+%\clrangle{\log \sigma}&=\log b -\psi(a)
+%\end{align}
+%Therefore, $F$ can be summarised w.r.t. the terms dependent on $a$ and $b$ as,
+%\begin{align}
+%\nonumber F=&-\chalf{}\sum_{j=1}^{D}\log\clrbracket{\frac{a(a+1)}{b^2}\sigma_{\Sigma(j)}+\frac{1}{1000}}-a\log b+\log\Gamma(a)\\ 
+%\nonumber &-\frac{\sqrt{a(a+1)}}{b}C+(a-N)(\log b-\psi(a))+(b-\gamma)\frac{a}{b}-\delta\frac{a(a+1)}{b}\\
+%\nonumber =&-\chalf{}\sum_{j=1}^{D}\log\clrbracket{\frac{a(a+1)}{b^2}\sigma_{\Sigma(j)}+\frac{1}{1000}}+\log\Gamma(a)-a\psi(a)+a\\
+%&-\frac{\sqrt{a(a+1)}}{b}C-N(\log b-\psi(a))-\gamma\frac{a}{b}-\delta\frac{a(a+1)}{b}\\
+%\nonumber C=&\sqrt{\clrbracket{\frac{(1-2\alpha)^2}{4}+\caexp}}\csum\sqrt{(y_i-\cx_i^T\cmu)^2+\cx_i^T\cSigma\cx_i}\\
+%\nonumber\frac{\partial F}{\partial a}=&-\chalf{}\sum_{j=1}^{D}\frac{(2a+1)\sigma_{\Sigma(j)}}{a(a+1)\sigma_{\Sigma(j)}+\frac{b^2}{1000}}-\chalf{}\frac{2a+1}{\sqrt{a(a+1)}}\frac{C}{b}\\
+%&+(N-a)\psi^{(1)}(a)-\gamma\frac{1}{b}-\delta\frac{2a+1}{b}+1\\
+%\frac{\partial F}{\partial b}=&\sum_{j=1}^{D}\frac{a(a+1)\sigma_{\Sigma(j)}}{a(a+1)b\,\sigma_{\Sigma(j)}+\frac{b^3}{1000}}+\frac{\sqrt{a(a+1)}}{b^2}C-\frac{N}{b}+\gamma\frac{a}{b^2}+\delta\frac{a(a+1)}{b^2}
+%\end{align}
+
+\section{Prediction}
+To predict we are required to marginalise out all latent variables, $\int p(y_\star|\cx_\star,\cx,\cbeta,\sigma,\cw_\star,\cw,\alpha)p(\cx,\cbeta,\sigma,\cw|\alpha)\,dz_\star\,dz$, where $z_\star$ and $z$ denotes the set of latent variables of the test and training set respectively. This marginalisation can be approximated to  $\int p(y_\star|\cx_\star,\cbeta,\sigma,\cw_\star,\alpha)q(\cbeta)q(\sigma)q(\cw)\,dz_\star\,dz$.
+
+\pagebreak
+\section{Lower Bound for Likelihood}
+Using the EM algorithm it can be shown that $\int q(z)\log p(x,z)-q(z)\log q(z)\,dz$ is a lower bound where, $z$ are the latent variables.
+
+The first term $\int q(z)\log p(x,z)dz$ can be shown to be,
+\begin{align}
+\nonumber
+&=-\chalf{}\Biggl[N\log\frac{4\pi}{\caexp}+\csum\clrangle{\log w_i} +2(N+1)\clrangle{\log\sigma}\\
+\nonumber&+\clrangle{\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cx_i\cx_i^T+\frac{1}{1000}\cI}\cbeta}\\
+\nonumber
+&-2\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_i^T}\clrangle{\cbeta}\\
+\nonumber
+&+\frac{\caexp}{2}\clrangle{\frac{1}{\css}}\csum\clrangle{\frac{1}{w_i}}y_i^2+\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}\csum\clrangle{w_i}-(1-2\alpha)\clrangle{\frac{1}{\sigma}}\csum y_i\Biggr]
+\end{align}
+
+The second term $\int q(z)\log q(z)dz$ can be shown to be,
+\begin{align}
+\nonumber&-\chalf{}\Biggl[D\log(2\pi)+\log |\cSigma|+\clrangle{\cbeta^T\cSigma^{-1}\cbeta}-2\cmu^T\cSigma^{-1}\clrangle{\cbeta}+\cmu^T\cSigma^{-1}\cmu\Biggr]\\
+&\nonumber+\frac{1}{4}\csum(\log\alpha_i-\log\beta_i)-N\log 2- \csum\log\cBess_{1/2}\clrbracket{\sqrt{\alpha_i\beta_i}}\\
+\nonumber&-\chalf{}\csum\Biggl[\clrangle{\log w_i} +\alpha_i\clrangle{w_i}+\beta_i\clrangle{\frac{1}{w_i}}\Biggr]\\
+\nonumber&+\frac{N-2}{2}\log 2\delta-\log U\clrbracket{N-\frac{5}{2},\frac{\gamma}{\sqrt{2\delta}}}-\log \Gamma(N-2)-\clrbracket{\frac{\gamma^2}{8\delta}}\\
+\nonumber&-(N+1)\clrangle{\log\sigma}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\css}}\\
+\nonumber
+=&-\chalf{}\clrbracket{D+D\log2\pi+\log|\cSigma|}-\frac{N}{2}\log 2-\frac{N}{2}\log\pi+\chalf{}\csum\log\alpha_i+\sqrt{\alpha_i\beta_i}\\
+\nonumber&-\chalf{}\csum\Biggl[\clrangle{\log w_i} +\alpha_i\clrangle{w_i}+\beta_i\clrangle{\frac{1}{w_i}}\Biggr]\\
+\nonumber&+\frac{N-2}{2}\log 2\delta-\log U\clrbracket{N-\frac{5}{2},\frac{\gamma}{\sqrt{2\delta}}}-\log \Gamma(N-2)-\clrbracket{\frac{\gamma^2}{8\delta}}\\
+\nonumber&-(N+1)\clrangle{\log\sigma}-\gamma\clrangle{\frac{1}{\sigma}}-\delta\clrangle{\frac{1}{\css}}
+\end{align}
+
+
+\appendix
+\section{Approximate distribution $q(\sigma)$}
+In the following the derivation of the normalising constant, $C$ and the relevant expectations will be shown. Let $q(\sigma)\propto\sigma^{-a}\exp\clrbracket{-b/\sigma-c/\sigma^2}$
+\begin{align}
+\nonumber C&=\cint\sigma^{-a}\exp\clrbracket{-b/\sigma-c/\sigma^2}\,d\sigma\\
+\nonumber \text{let}\quad u=1/\sigma\quad C &=\cint u^{a-2}\exp(-bu-cu^2)\,du \\
+\nonumber \text{let}\quad t=\sqrt{2c}u \quad C & =\cint\frac{t^{a-2}}{(2c)^{\frac{a-1}{2}}}\exp\clrbracket{-\frac{b}{\sqrt{2c}}t-\chalf{}t^2}\,dt\\
+\therefore C &=\frac{1}{(2c)^{\frac{a-1}{2}}}U\clrbracket{a-\frac{3}{2},\frac{b}{\sqrt{2c}}}\Gamma(a-1)\exp\clrbracket{\frac{b^2}{8c}}\\
+\nonumber \clrangle{\frac{1}{\sigma}}&=\frac{1}{C}\cint\sigma^{-(a+1)}\exp\clrbracket{-b/\sigma-c/\sigma^2}\,d\sigma\\
+&=\frac{a-1}{\sqrt{2c}}\,\frac{U\clrbracket{a-\chalf{},\frac{b}{\sqrt{2c}}}}{U\clrbracket{a-\frac{3}{2},\frac{b}{\sqrt{2c}}}}\\
+\clrangle{\frac{1}{\sigma^2}}&=\frac{a(a-1)}{2c}\,\frac{U\clrbracket{a+\chalf{},\frac{b}{\sqrt{2c}}}}{U\clrbracket{a-\frac{3}{2},\frac{b}{\sqrt{2c}}}}
+\end{align}
+Where U is the parabolic cylindrical function (http://dlmf.nist.gov/12.5)
+\end{document}
