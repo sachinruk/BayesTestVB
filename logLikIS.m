@@ -1,4 +1,5 @@
-function L=likPost(y,x,alpha,mu,Sigma)
+function L=logLikIS(y,x,alpha,mu,Sigma)
+%log likelihood using importance sampling
 
 n=10000;
 %simulate n betas from mu,Sigma

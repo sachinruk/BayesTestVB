@@ -10,16 +10,16 @@ This section on deriving approximate posteriors on the latent variables for quan
 Approximate posterior on $\cbeta$ and relevant expectations
 \begin{align}
 \nonumber
-\log q(\cbeta)&=\clrangle{-\chalf{}\frac{\caexp}{2\sigma^2}\csum\frac{1}{w_i}\clrbracket{\cbeta^T \cx_t+\frac{1-2\alpha}{\caexp}\sigma w_t-y_t}^2}_{q(w_t)q(\sigma)}\\
+\log q(\cbeta)&=\clrangle{-\chalf{}\frac{\caexp}{2\sigma^2}\csum\frac{1}{w_i}\clrbracket{\cbeta^T \cW_t+\frac{1-2\alpha}{\caexp}\sigma w_t-y_t}^2}_{q(w_t)q(\sigma)}\\
 \nonumber
 &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\chalf{}\times\frac{1}{1000}\cbeta^T\cbeta\\
 \nonumber
-&=-\chalf{}\Biggl[\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cx_t\cx_t^T+\frac{1}{1000}\cI}\cbeta\\
+&=-\chalf{}\Biggl[\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cW_t\cW_t^T+\frac{1}{1000}\cI}\cbeta\\
 \nonumber
-&-2\clrbracket{\csum\left[\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}\right]\cx_t^T}\cbeta\Biggr]\\
+&-2\clrbracket{\csum\left[\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}\right]\cW_t^T}\cbeta\Biggr]\\
 \therefore q(\cbeta)&\sim\cN(\cmu,\cSigma)\\
-\cSigma &=\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cx_t\cx_t^T+\frac{1}{1000}\cI}^{-1}\\
-\cmu&=\cSigma\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_t}\\
+\cSigma &=\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cW_t\cW_t^T+\frac{1}{1000}\cI}^{-1}\\
+\cmu&=\cSigma\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cW_t}\\
 \clrangle{\cbeta}&=\cmu\\
 \clrangle{\cbeta\cbeta^T}&=\cSigma+\cmu\cmu^T
 \end{align}
@@ -30,16 +30,16 @@ Approximate posterior on $w_i$ and relevant expectations.
 \nonumber
 \log (q(w_i))&=-w_i-\chalf{}\log(w_i)\\
 \nonumber
-&\qquad\qquad\quad-\chalf{}\clrangle{\frac{\caexp}{2\sigma^2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(\sigma)}\\
+&\qquad\qquad\quad-\chalf{}\clrangle{\frac{\caexp}{2\sigma^2 w_i}\clrbracket{\cbeta^T \cW_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(\sigma)}\\
 \nonumber
 &=-w_i-\chalf{}\log(w_i)\\
-\nonumber&-\chalf{}\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\nonumber&-\chalf{}\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cW_i^T\clrangle{\cbeta}+\cW_i^T\clrangle{\cbeta\cbeta^T}\cW_i}\frac{1}{w_i}}\\
 \nonumber
 &=-\chalf{}\log(w_i)\\
-\nonumber&-\chalf{}\clrbracket{\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\frac{1}{w_i}}\\
+\nonumber&-\chalf{}\clrbracket{\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}w_i+\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cW_i^T\clrangle{\cbeta}+\cW_i^T\clrangle{\cbeta\cbeta^T}\cW_i}\frac{1}{w_i}}\\
 \therefore q(w_i) & = \cGIG\clrbracket{\chalf{},\alpha,\beta}\\
 \alpha_i & =\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2} \\
-\beta_i & = \frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\beta_i & = \frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_i^2-2y_i\cW_i^T\clrangle{\cbeta}+\cW_i^T\clrangle{\cbeta\cbeta^T}\cW_i}\\
 \clrangle{\frac{1}{w_i}}&=\sqrt{\frac{\alpha_i}{\beta_i}}\\
 \clrangle{w_i}&=\sqrt{\frac{\beta_i}{\alpha_i}}+\frac{1}{\alpha_i}
 \end{align}
@@ -48,11 +48,11 @@ Approximate posterior on $w_i$ and relevant expectations.
 \label{sec:q_sigma}
 Approximate posterior on $\sigma$ and relevant expectations.
 \begin{align}
-\nonumber \log q(\sigma) & =-\frac{N}{2}\log \sigma^2-\chalf{}\csum\clrangle{\frac{\caexp}{2 w_i}\clrbracket{\cbeta^T \cx_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(w_i)}\frac{1}{\sigma^2}\\
+\nonumber \log q(\sigma) & =-\frac{N}{2}\log \sigma^2-\chalf{}\csum\clrangle{\frac{\caexp}{2 w_i}\clrbracket{\cbeta^T \cW_i+\frac{1-2\alpha}{\caexp}\sigma w_i-y_i}^2}_{q(\cbeta)q(w_i)}\frac{1}{\sigma^2}\\
 \nonumber &\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad-\log \sigma\\
 \nonumber &=-(N+1)\log \sigma-\gamma\frac{1}{\sigma}-\delta\frac{1}{\sigma^2}\\
-\gamma &= -{\frac{1-2\alpha}{2}\csum(y_i-\cx_i^T\clrangle{\cbeta})}\\
-\delta &=\frac{\caexp}{4}\csum\clrangle{\frac{1}{w_i}}\clrbracket{y_i^2-2y_i\cx_i^T\clrangle{\cbeta}+\cx_i^T\clrangle{\cbeta\cbeta^T}\cx_i}\\
+\gamma &= -{\frac{1-2\alpha}{2}\csum(y_i-\cW_i^T\clrangle{\cbeta})}\\
+\delta &=\frac{\caexp}{4}\csum\clrangle{\frac{1}{w_i}}\clrbracket{y_i^2-2y_i\cW_i^T\clrangle{\cbeta}+\cW_i^T\clrangle{\cbeta\cbeta^T}\cW_i}\\
 \clrangle{\frac{1}{\sigma}}&=\frac{N}{\sqrt{2\delta}}\,\frac{U(N+\chalf{},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}\\
 \clrangle{\frac{1}{\css}}&=\frac{N(N+1)}{2\delta}\,\frac{U(N+\frac{3}{2},\frac{\gamma}{\sqrt{2\delta}})}{U(N-\chalf{},\frac{\gamma}{\sqrt{2\delta}})}
 \end{align}
@@ -74,9 +74,9 @@ Using the EM algorithm it can be shown that $\int q(\cz)\log p(\cy,\cz)-q(\cz)\l
 \begin{align}
 \nonumber
 &=-\chalf{}\Biggl[N\log\frac{4\pi}{\caexp}+\csum\clrangle{\log w_i} +2(N+1)\clrangle{\log\sigma}+D\log (2\pi\times1000)\\
-\nonumber&+\clrangle{\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cx_i\cx_i^T+\frac{1}{1000}\cI}\cbeta}\\
+\nonumber&+\clrangle{\cbeta^T\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_i}}\cW_i\cW_i^T+\frac{1}{1000}\cI}\cbeta}\\
 \nonumber
-&-2\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cx_i^T}\clrangle{\cbeta}\\
+&-2\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_i}}y_i-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cW_i^T}\clrangle{\cbeta}\\
 \nonumber
 &+\frac{\caexp}{2}\clrangle{\frac{1}{\css}}\csum\clrangle{\frac{1}{w_i}}y_i^2+\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}\csum\clrangle{w_i}-(1-2\alpha)\clrangle{\frac{1}{\sigma}}\csum y_i\Biggr]\\
 \nonumber&=-\chalf{}\Biggl[N\log\frac{4\pi}{\caexp}+\csum\clrangle{\log w_i} +2(N+1)(\log b -\psi(a))+D\log (2\pi\times1000)\\
