@@ -4,7 +4,7 @@ clc
 
 sigmas=[0.1 0.1 2 2];
 betas=[-2 13; -5 65; 2 5; 10 2];
-alphas=0.04:0.02:0.96;
+alphas=0.1:0.1:0.9;
 N=10000;
 for k=1:4
     sigma= sigmas(k); 
@@ -22,9 +22,10 @@ for k=1:4
 
         %simulate observations
         x=[ones(N,1) 10*randn(N,1)+5]; y=x*beta_true'+e;
-        [mu,L,alpha_,beta,a,b]=vb3(y,x,alpha);
-        lb(i)=lowerBound(y,mu,L,alpha_,beta,a,b,alpha);
-
+        rng(1);
+        [mu,Linv,alpha_,beta,a,b,lik]=vb3(y,x,0.01);
+        lb(i)=lowerBound(y,mu,Linv,alpha_,beta,a,b,alpha);
+        lb2(i)=lik;
         % [mu2,Sigma,alpha_2,beta2,a2,b2]=vb2(y,x,alpha);
         % F(y,mu2,Sigma,alpha_2,beta2,a2,b2,alpha)
 
@@ -38,7 +39,8 @@ for k=1:4
     end
     % likMetropolis(y,x,beta(:,1000:end),alpha,mu,Sigma)
 
-    figure; plot(alphas,llik); hold on; plot(alphas,lb,'r')
+    figure; subplot(121); plot(alphas,llik,'b'); hold on; plot(alphas,lb,'r'); 
+    subplot(122); plot(alphas,llik,'b'); hold on; plot(alphas,lb2,'g');
     % figure; plot(alphas,llik-lb); 
 end
 
