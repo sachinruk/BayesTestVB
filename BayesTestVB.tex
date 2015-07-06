@@ -1,0 +1,1140 @@
+\documentclass[12pt,epsf]{article}
+\usepackage{indentfirst}
+\usepackage{array}
+
+\usepackage[usenames]{color}
+\usepackage{psfrag,graphicx}
+\usepackage{eso-pic,graphicx}
+\usepackage{colortbl}
+
+%Sachins packages
+\input{eqn_abbr}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{breqn}
+\usepackage{refstyle}
+\usepackage[toc,page]{appendix}
+%\usepackage{graphicx}
+%\DeclareGraphicsRule{*}{eps}{.bb}{}
+\renewcommand{\baselinestretch}{1.5}
+\setlength{\oddsidemargin}{0in} \setlength{\evensidemargin}{0in} \setlength{\textwidth}{6.5in}
+\setlength{\textheight}{8.3in} \setlength{\headsep}{0in} \setlength{\parindent}{0.3in} \marginparwidth 0pt
+\oddsidemargin 0pt \evensidemargin 0pt \marginparsep 0pt \topmargin 0pt \headheight 0pt \headsep 0pt \textheight
+23.5 truecm \textwidth 16.0 truecm
+\newtheorem{theorem}{Theorem}
+\newcommand{\utwi}[1]{\mbox{\boldmath $ #1$}}
+\newcommand{\ratio}{($\sigma_{\phi_i}/\tau_{i}, c_i$)}
+\newcommand{\hs}{\hspace{1cm}}
+\newcommand{\utheta}{\utwi{\theta}}
+\newcommand{\ualp}{\utwi{\alpha}}
+\newcommand{\calF}{{\cal F}}
+\newcommand{\blue}[1]{\textcolor{blue}{$#1$}}
+\newcommand{\red}[1]{\textcolor{red}{$#1$}}
+\newcommand{\ignore}[1]{}{}
+\newcommand{\cblue}{\textcolor{blue}}
+\newcommand{\cred}{\textcolor{red}}
+\definecolor{slight}{gray}{0.75}
+\fboxsep=1pt
+\def\r{\color{red}}
+\def\cblue{\color{blue}}
+\date{}
+
+
+\begin{document}
+%\title{\Large \bf Variational Bayes for Assessment of Dynamic Quantile Forecasts}
+%
+%\author{
+%\normalsize  Richard Gerlach$^{1}$\thanks{Corresponding author: Richard Gerlach, Email: richard.gerlach@sydney.edu.au}
+%and Sachin Abeywadena$^{2}$ \\
+%\normalsize $^{1}$ The University of Sydney Business School, Australia. \\
+%\normalsize $^{2}$ School of Engineering, The University of Sydney, Australia.}
+%
+%\maketitle
+
+\noindent
+
+\thispagestyle{empty}
+\begin{abstract}
+Methods for Bayesian testing and assessment of dynamic quantile forecasts have recently been proposed. Among these,
+simple Bayes factor analogues of popular frequentist tests for accuracy of dynamic quantile forecasts have been developed.
+To evaluate the relevant marginal likelihoods involved, either inappropriate assumptions have been made, or
+pre-packaged multivariate adaptive quadrature methods have been employed, without accuracy assessment. This paper develops variational
+Bayes methods to efficiently estimate lower bounds for the required marginal likelihoods. This facilitates a more accurate version of
+one existing Bayesian test, and allows the development of a new test that out-performs its competing
+Bayesian and frequentist analogues. The size and power properties of the proposed methods are examined via a simulation study,
+illustrating favourable comparisons with existing testing methods. An empirical study employs
+the proposed methods, in comparison with standard tests, to assess the adequacy of a range of
+forecast models for Value at Risk (VaR) in several financial market data series.
+\end{abstract} \noindent {\em Key words}:Bayesian Hypothesis
+testing; Bayes factor; asymmetric-Laplace distribution; Value-at-Risk; quantile regression.
+
+%\noindent {\em JEL Code:} Bayesian Hypothesis testing, MCMC, Value-at-Risk, quantile estimation.
+
+
+%\newpage
+%\setcounter{page}{2}
+
+\section{Introduction}
+%% Determining the accuracy of VaR models
+
+Value-at-Risk (VaR) is now a standard measurement tool in risk management, used extensively by banking and other financial institutions.
+It is an estimate (forecast) of the size of the minimum potential loss, over a given time horizon, with a specified probability,
+for a financial position. VaR thus corresponds to the multiple of a quantile of the financial return distribution. It is a measure
+that is widely used in practice for capital allocation, to protect against large negative market movements in asset prices,
+following the Basel II Capital Accord. The accord further advises risk managers to regularly back-test their VaR forecast models,
+using at least one year of historical data to compare actual returns with VaR forecasts. This paper proposes variational Bayes (VB) methods
+to estimate the marginal likelihoods involved in Bayes factor methods, in the process developing more powerful back-testing methods.
+
+Four well-known formal back-testing methods for quantile (VaR) forecasts are: the unconditional coverage (UC) test of Kupiec (1995); the
+conditional coverage (CC) test of Christoffersen (1998); the dynamic quantile (DQ) test of Engle and Manganelli (2004); and the VaR Quantile
+Regression (VQR) test of Gaglianone et al. (2011). Berkowitz, Christofferson and Pelletier (2011) developed a unified Lagrange
+Multiplier framework for VaR assessment, incorporating these tests (except the VQR). Gaglianone et al. (2011) highlighted that the
+VQR and DQ tests were over-sized in general, more-so in smaller samples, but have higher size-adjusted power than the UC and CC tests.
+The latter outcome highlights that the VQR and DQ tests use more information, and in a mostly more effective manner, than the binary
+variables that the UC and CC tests solely rely on; whilst the former result indicates a potential opportunity to develop better
+and more accurate tests: this is the goal of this paper.
+
+Bayesian methods for back-testing VaR forecasts are developed in Gerlach, Chen and Lin (2014), who develop a suite of
+Bayesian methods that are roughly analogous to, and in simulations compare favourably with, the aforementioned four frequentist tests.
+Their proposed methods are based on Bayes factors, requiring estimation of marginal likelihoods. The estimators proposed either
+make an inappropriate assumption of Gaussianity ("for simplicity"), to allow analytic integration; or,
+employ adaptive quadrature methods, which are not standard in the estimation of marginal likelihoods and can be inaccurate, especially in
+highly concentrated likelihood situations. It is well known, see e.g. Berger (19xx) and Robert (20xx), that prior formulation plays a significant
+role in Bayesian hypothesis testing and model selection. In this paper, the role of the prior choice is illustrated explicitly, whilst the
+existing tests used and new tests developed are made somewhat robust to a wide range of possible prior variances, through an empirical size adjustment process.
+
+The goal of this paper is to develop two further Bayesian testing methods for quantile forecast adequacy: one is a new test,
+whilst the second attempts to improve on the accuracy of the quadrature-reliant method in Gerlach et al (2014). Both these tests
+employ a method known as variational Bayes, to estimate lower bounds for the required marginal likelihoods. Variational Bayes (VB)
+methods have become popular in the literature for fast and accurate approximation of intractable likelihoods in Bayesian settings,
+e.g. see Ormerod and Wand (2010) and Girolami and Rogers (2006). As with the UC, CC, DQ and VQR tests, the proposed Bayesian tests
+do not depend on the method of estimation of the model parameters involved in forecasting, and depend only weakly on the model that
+generated the data.
+
+The article is organized as follows: Section 2 reviews the evaluation of quantile forecast accuracy via existing frequentist
+and Bayesian tests, as well as the variational Bayes method; Section 3 introduces the two new testing procedures;
+Sections 4 and 5 present and discuss the results from a simulation study; Section 6 illustrates the results of an
+empirical study comparing a range of competing VaR methods; concluding remarks appear in Section 7.
+
+\section{Evaluating quantile forecast accuracy}
+Let $y_t$ denote a financial asset return observation at time $t$, then VaR ($VaR_t$) at level $\alpha$ can be defined via:
+\begin{eqnarray*}
+\textrm{Pr}(y_t < \mbox{VaR}_t|\calF_{t-1}) = \alpha \, ,
+\end{eqnarray*}
+where $\calF_{t-1}$ is the information available at time $t-1$. For a forecast sample period, the
+observed violation rate is the number of return observations that are more extreme than their
+respective VaR forecast (i.e. $I_t = I(y_{t}< \mbox{VaR}_{t})=1$)), divided by the forecast sample size $T$.
+
+There are many models and methods to estimate and forecast $\mbox{VaR}_{t}$ in financial return series. Regardless of which is employed,
+the frequentist tests below can be applied to "back-test" each. This paper does not consider the UC or CC tests, as Galgianone et al (2011)
+demonstrated their relatively low power compared to the DQ and VQR tests considered here.
+
+\subsection{Frequentist testing}
+Engle and Manganelli (2004) develop the DQ test, a joint test for correct rate and independence of violations. The null hypothesis
+is: $ H_{0} \,:\, I_t$, $t=1,\ldots,T$ is an i.i.d. series with violation rate $\alpha$. A binary series of ``hits'',
+$H_t = I_{t}-\alpha$, are then calculated. Under the null $E(H_t) = 0$ and $E(H_tW_{it})=0$, where $W_t$ contains an intercept plus
+$q-1$ relevant explanatory variables, available at time $t-1$. The DQ test statistic examines whether all
+parameters in a regression of $H$ on $W$ equal zero, calculated as:
+\begin{eqnarray*}
+\mbox{DQ}(q) = \frac{\utwi{H}'\utwi{W}\left(\utwi{W}'\utwi{W}\right)^{-1}\utwi{W}'\utwi{H}}{\alpha(1-\alpha)} \,\,.
+\end{eqnarray*}
+This statistic is analogous to a regression F statistic but including the intercept in the test. Under the null,
+$DQ(q)$ tends to a $\chi^2_q$ distribution as $T$ gets large.
+As in Engle and Manganelli (2004), we employ $p$ lagged hits and the VaR forecast at time $t$ as explanatory variables,
+i.e. $W_t^{'} = (1, H_{t-1}, \mbox{VaR}_{t})$ ($p=1, q=3$, denoted as DQ1) and $W_t^{'} = (H_{t-1}, \ldots, H_{t-4}, \mbox{VaR}_{t})$
+($p=4, q=6$, DQ4).
+
+Gaglianone et al. (2011) employed direct ``Mincer-Zarnowitz'' quantile regression for the $\alpha$th conditional quantile of $y_t$:
+\begin{eqnarray}\label{qreg}
+Q_{y_t } (\alpha |\calF_{t-1}  ) = \beta_0  + \beta_1 VaR_t, \quad{\textrm{for all }}\alpha  \in {\rm{(0,1)}},
+\end{eqnarray}
+their test employs the actual data, not violation indicators, as well as the VaR forecast series itself, thus employing more information
+than the UC, CC and DQ tests. If the VaR forecasts are accurate, then $\beta _0  = 0, \beta _1  = -1$ in \ref{qreg}.
+Gaglianone et al. (2011) test the hypothesis: $\theta= (\beta_0, \beta_1-1)^{'} = \bf{0}$, using the statistic
+$\mbox{VQR} = \hat{\theta}^{'} \left(\hat{\Sigma} \right)^{-1} \hat{\theta}$,
+which asymptotically follows a $\chi^2_2$ distribution under the null hypothesis. We followed Gaglianone et al. (2011) and
+Koenker and Machado (1999)'s recommendations here, in particular to estimate the matrix $\Sigma$. See those papers for details.
+
+These are two of the most powerful, best performing tests in the literature to assess the accuracy of and back-test quantile forecasts.
+In the next section two of the most powerful Bayesian tests in Gerlach et al (2014) are reviewed.
+
+\subsection{Bayes Factor Testing}
+In a Bayesian framework, hypothesis testing and model comparison problems can be tackled via marginal likelihoods, that are often
+translated into Bayes factors (BFs). A general rule is that
+$$ p(y|M_k) = \int p(y|\theta, M_k) p(\theta | M_k) d \theta \,\, ,$$
+where model $M_k$ is generally preferred over $M_j$ if
+$\mbox{BF} =\frac{p(y| M_k)}{p(y|M_j)} > 1$. BFs are also employed in hypothesis testing, i.e.  $H_{0}\, : \, \theta= \theta_0$,
+where the hypothesis is conventionally rejected if $\frac{p(y|\theta_0, M)}{p(y|M)} < 1$. Berger (19x) and Robert (20xx) discuss how
+the prior choice, well known to diminish with sample size Bayesian inference problems, can strongly affect Bayesian testing and model
+selection. In the next section, this aspect is explicitly illustrated.
+
+\subsubsection{A BF Dynamic Quantile test}
+A Bayes factor requires a model and data distribution to produce a likelihood. The DQ test employs the series of
+``hits'' $H_t = I_{t}-\alpha$, $t=1,\ldots,T$ and fits a regression: $ H_t = W_{t}\utwi{\beta} + \epsilon_t$, with $W$ defined previously and
+containing $p=q-2$ lags of the hit series.
+For a likelihood, a distribution needs to assumed for $\epsilon_t$. The simplest, but non-intuitive choice, as made by
+Gerlach et al (2014), is $\epsilon_t \sim N(0,\sigma^2)$. This leads to:
+$$
+p(H|\beta,\sigma^2) = (2 \pi)^{-0.5(T-p)} (\sigma^2)^{-\frac{T-p}{2}} \exp\left( -\frac{1}{2\sigma^2} \sum_{t=p+1}^T \epsilon_t^2\right)
+\,\, .
+$$
+A proper, conjugate Gaussian prior on $\beta$ is chosen, i.e. $\beta|\sigma^2 \sim N(0,C \sigma^2)$, where $C =cI$ is a diagonal matrix
+with all diagonal elements $=c$, and a standard Jeffreys' prior is chosen for $\sigma^2$, i.e. $p(\sigma^2) \propto \sigma^{-2}$.
+Choosing the prior for $\beta$ conditional on $\sigma^2$ allows this nuisance parameter to be
+conveniently, analytically integrated out. The BF statistic is then:
+\begin{eqnarray*}
+\mbox{BFDQ} &=& \frac{p(H|\utwi{\beta}={\bf 0})}{p(H)} \\
+            &=& \frac{\int p(H|\utwi{\beta}={\bf 0},\sigma^2) p(\sigma^2) d \sigma^2}{\int \ldots \int p(H | \utwi{\beta},\sigma^2)p(\utwi{\beta}|\sigma^2) p(\sigma^2) d \sigma^2 d \utwi{\beta}} \\
+            &=& c^{0.5q} |A|^{0.5} (H'H-B'A^{-1}B)^{0.5(T-p)}(H'H)^{-0.5(T-p)},
+\end{eqnarray*}
+where $p = q-2$; $B = W'H$, $A=W'W+c^{-1}I$ and $|A|$ is the determinant of $A$.
+Gerlach et al (2014) employ the same regressors as for the DQ statistics, giving BFDQ1 and BFDQ4 tests. Under the null,
+all $\utwi{\beta} = {\bf 0}$, which is conventionally rejected whenever BFDQ$<1$. The integrals above can be analytically performed, first
+because $p(H | \utwi{\beta},\sigma^2)p(\utwi{\beta}|\sigma^2)$ is proportional to a Gaussian distribution in $\utwi{\beta}$ and then
+because both the resulting integrand and the numerator are proportional to an inverse gamma distribution in $\sigma^2$.
+Smith and Kohn (1996) give an exposition of such Bayesian integrals in regression models.
+
+The role of $c$ here is fairly explicit and clear: i.e. as $c \Rightarrow \infty$, $A \Rightarrow W'W$, $B'A^{-1}B \Rightarrow H'W(W'W)^{-1}W'H$
+and $BFDQ \Rightarrow \infty$. Thus, as the prior variance $c \Rightarrow \infty$ the
+null will never be rejected, known as Bartlett's paradox. Further, changing the value of $c$ will clearly shift the entire
+distribution of BFDQ, and in a predictable manner if diag$(W'W)$ dominates $c^{-1}$, indicating that the conventional threshold of 1 may not
+lead to an adequate or sensible decision rule here. To combat this, the use of empirical size adjusted thresholds, a common practice in
+frequentist testing, is recommended, as discussed in a later section. Subsequently, we recommend $c=1000$ (so that diag$(W'W)$ will dominate
+$c^{-1}$) is chosen, though we discuss some robustness properties of our results to different choices for $c$ in a later section.
+
+Naturally, other choices are possible and more sensible here, other than Gaussian errors. In the next
+section a new testing procedure that makes more reasonable assumptions is developed, that retains the same spirit as the DQ framework.
+
+\subsubsection{A BF VQR test}
+Koenker and Machado (1999) note that quantile regression estimation, usually performed by minimising the quantile distance function:
+\begin{eqnarray*}
+\stackrel{\rm min}{\utwi{\beta}} \,\, \sum_{t} u_{t} \left[\alpha-I(u_{t}<0)\right]
+\end{eqnarray*}
+is equivalent to a maximum likelihood (ML) estimation procedure when assuming i.i.d. skewed Laplace errors,
+i.e. $u \sim SL(0,\sigma,\alpha)$, so that:
+\begin{eqnarray*}
+p_{\alpha}(u)=\frac{\alpha(1-\alpha)}{\sigma}\exp\left[-\left (\frac{u\left[\alpha-I(u<0)\right]}{\sigma}\right)\right].
+\end{eqnarray*}
+The ML and usual quantile regression estimates for $\utwi{\beta}$ are mathematically equivalent in this case.
+
+The quantile regression model for the $\alpha$th conditional quantile of $y_t$ against its VaR forecast, can be written:
+\begin{eqnarray*}
+Q_{y_t} (\alpha |\calF_{t-1}  ) = \beta_0  + \beta_1 VaR_t, \quad{\textrm{for all }}\alpha  \in {\rm{(0,1)}} \,.
+\end{eqnarray*}
+To develop a Bayesian VQ procedure, again assuming a Jeffreys prior on $\sigma$ and integrating it out, Gerlach et al (2014) found:
+\begin{eqnarray*}
+p(\utwi{u}|\utwi{\beta}) = \alpha^T(1-\alpha)^T \Gamma(T) \left[\sum^{T}_{t=1} u_{t}(\alpha-I(u_t<0)) \right]^{-T} \,\, .
+\end{eqnarray*}
+Thus, the BFVQ statistic they develop is:
+$$
+\mbox{BFVQ} = \frac{ p({\bf u}|\beta_0=0, \beta_1=1)}{ \int \int p({\bf u}|\utwi{\beta}) p(\utwi{\beta}) d \beta_0 d \beta_1 }
+$$
+where the null of $\beta_0=0, \beta_1=1$ is rejected whenever $BFVQ<1$. The denominator above is a double integral over the
+bivariate real line. Gerlach et al (2014) employ a highly diffuse, but proper, Gaussian prior on $\beta$, i.e. $N(0,cI)$.
+The region of integration is then transformed to the region $(-1,1)\times(-1,1)$ and adaptive quadrature methods are employed to
+numerically estimate this integral; they did not assess the accuracy of this method.
+
+It is again possible to show that the term $c^{0.5q}$, where $q=2$ here, appears as a multiple
+in the expression for BFVQ, which otherwise has no closed form due to the numerically approximated denominator. Thus the estimate of
+BFVQ tends to $\infty$ as $c \Rightarrow \infty$ and the null will never be rejected in that case.
+Again the distribution of BFVQ will be significantly shifted by changing $c$ and the threshold value of 1 is likely not an optimal decision rule.
+
+This paper develops a new DQ style BF test and develops an alternative estimator for the marginal likelihood in the BFVQ method. Both these estimators employ the method of variational Bayes, now discussed.
+
+\subsection{Variational Bayes}
+\label{sec:VB}
+Generally, the marginal likelihood $p(\cy|M)$ required in the BF is not analytically tractable. VB methods estimate a
+lower bound for this quantity, optimised to be as close as possible to $p(\cy|M)$ under certain assumptions. In such cases, the
+marginal log-likelihood, $\log p(\cy|M)$, can be expressed as:
+$\mathcal{L}(q(\cz),\theta)+KL(q(\cz)||p(\cz|\cy))$ where, $\mathcal{L}(q(\cz),\theta)=\int\int q(\cz)\log\frac{p(\cz,\cy)}{q(\cz)}d\cz$ is
+the expected joint log-likelihood of a set of relevant latent variables $\{\cz\}$ and $\cy$, with respect to a proposal
+distribution $q(\cz)$; $\theta$ are the hyper-parameters.
+Here, $KL$ is the Kullback-Leibler divergence between the proposal distribution and the posterior distribution of the latent variables.
+Note that $\mathcal{L}(q(\cz),\theta)$ is a lower bound to the true log of the likelihood, since $KL>0$.
+The Expectation-Maximisation (EM) algorithm proceeds by initially minimizing the KL divergence for a given set of hyper parameters,
+$\theta$ (i.e. finding an appropriate $q(\cdot)$). Usually, this is done by setting $p(\cz|\cy,\theta)=q(\cz)$, in which
+case $\log p(\cy|\theta)=\mathcal{L}(q(\cz),\theta)$.
+
+However, an appropriate analytic distribution for the full posterior $p(\cz|\cy)$ often cannot be found. VB methods
+(see e.g. Tzikas, Likas and Galatsanos, 2008 and Ormerod and Wand, 2010) differ from EM in that they focus far
+more in maximising the lower bound $\mathcal{L}(q(\cz),\theta)$ and not on minimising the KL divergence. Additionally, to gain
+tractability of $\mathcal{L}(q(\cz),\theta)$ it is often assumed that the proposal distribution can be factored such that:
+$q(\cz_1,\cz_2;\theta)=q_1(\cz_1)q_2(\cz_2)\approx p(\cz_1,\cz_2|\cy,\theta)$.
+It can be shown that for each proposal distribution
+$\log q_i(\cz_i) \propto E_{q(\cz_{/i})}\clrbracket{\log p(\cy | \cz_i,\cz_{/i},\theta)+\log p(\cz_i)}$ where $\cz_{/i}$ is all latent
+variables but the $i$-th, and the expectation $E$ is taken with respect to all $q(\cz_j)$ but the $i$-th. Due to the dependence
+of the $i$-th proposal distribution on the rest of the proposal distributions, this algorithm is iterated until convergence.
+
+It is clear that the effect of the prior variance $c$ on $\beta$ will shift the distribution of the BF statistics above and
+that using the rule $BF<1$ may not be appropriate depending on $c$. The fact that VB methods estimate a lower bound for the
+marginal likelihood $p(\cy|M)$ in the denominator of each BF means that using VB will result in systematically upwardly shifted BF estimates;
+this would clearly also occur if $c$ was increased. In a subsequent section, the frequentist method of empirical size adjustment is employed
+to mitigate the effects of both $c$ and $VB$ under-estimation, so as to choose more appropriate thresholds that lead to sensible and
+(more) powerful (size-adjusted) BF methods.
+
+\section{Two new Bayesian quantile testing procedures}
+This section presents two new procedures that employ VB to estimate lower bounds for the required marginal likelihoods.
+
+\subsection{A new Bayesian DQ procedure}
+Engle and Manganelli (2004) employ a standard OLS estimation algorithm to a binary dependent variable regression. In this setting, it is
+more typical to prefer a logistic or probit regression formulation. The standard probit specification allows a
+convenient VB representation, as in Girolami and Rogers (2006), and MCMC framework in Albert and Chib (1993).
+Keeping the DQ test notation above, a probit specification is:
+$$ Pr\clrbracket{I_t=1 | \calF_{t-1} = \Phi \left(W_t^{'}\utwi{\beta}\right)},$$
+with associated likelihood function:
+$$
+p({\bf I}|\utwi{\beta}) = \Pi_{t=p+1}^{n} \Phi\left(W_t^{'}\utwi{\beta} \right)^{I_t}
+\left(1-\Phi\left(W_t^{'}\utwi{\beta} \right)\right)^{1-I_t} \,.
+$$
+Under the null of independent violations with rate $\alpha$, the intercept is
+$\beta_0 = \Phi^{-1}(\alpha)$ and all slope parameters $\beta_i = 0$, $i=1,\ldots,p$. Thus,
+the relevant BF here is:
+\begin{eqnarray*}
+\mbox{VBDQ} = \frac{ p({\bf I} | \beta_0 = \Phi^{-1}(\alpha), \beta_1=0,\ldots,\beta_p)}
+              { \int \ldots \int p({\bf I}|\utwi{\beta}) p(\utwi{\beta}) d \utwi{\beta} } \,\, ,
+\end{eqnarray*}
+where the null is conventionally rejected whenever $VBDQ<1$.
+
+The denominator is a multiple integral over the real line, in $q$ dimensions. As in Gerlach et al (2014), a highly diffuse, but proper,
+Gaussian prior on $\utwi{\beta}$ is chosen, i.e. $\utwi{\beta} \sim N(0,cI)$, where $c$ is finite; the
+integral is still intractable under that choice. Employing the usual Gaussian latent variable representation of the probit specification,
+the VB lower bound estimate of Girolami and Rogers (2006) is employed, as derived in \secref{class_beta} and \secref{class_y},
+yielding the lower bound for the denominator in VBDQ as:
+\begin{align}
+\mbox{LBDQ} = \exp \left[-\chalf{}\clrbracket{T\log 2\pi+q\log c+\frac{\cmu'\cmu+Tr(\cSigma)}{c}+
+\sum_{t=1}^{T}\cW_t'\cSigma\cW_t-q-\log|\cSigma|-\sum_{t=1}^{T}\log C_t} \right] \,\, ,
+\end{align}
+where $T, W_t$ are defined as for the BFDQ statistics, while $\cmu, \cSigma$ are derived in \secref{class_beta} - \secref{class_lik},
+and are: $\cSigma= (\cW'\cW+\frac{1}{c}\cI)^{-1}$, $\cmu =\cSigma\cW'\clrangle{\cy^*}$, where $\cy^*$ is the Gaussian latent variable
+and the notation $\clrangle{\cdot}$ is employed to denote an expectation under a relevant VB distribution $q(\cdot)$.
+See \secref{class_beta} - \secref{class_lik} for details. Choosing $p=1$ lagged hits gives the VBDQ1, $p=4$ lagged hits in $W$ gives the
+VBDQ4 statistic.
+
+The lower bound for the denominator will clearly tend to 0 as $c \Rightarrow \infty$, due to the term $\exp(-0.5q\log c) = c^{-0.5q}$.
+Thus, $c^{0.5q}$ again appears as a multiple in the VBDQ BF, thus the estimate of VBDQ tends to $\infty$ as $c \Rightarrow \infty$
+and the null will never be rejected in that case.
+
+As a reference, adaptive quadrature can also be employed to estimate the integral in the denominator of VBDQ, as for the BFVQ method; this
+is done with $p=1 (q=3)$ only and the resulting BF is denoted AQDQ1. The accuracy of the VBDQ1 method is also assessed by considering the
+marginal likelihood estimator in Chib (1995), based on the MCMC sampler for the probit regression model in Albert and Chib (1993). Kass and
+Raftery (1995) proposed Laplacian approximation to approximate marginal likelihoods. This
+involves a 2nd order Taylor series expansion of the integrand $p({\bf I}|\utwi{\beta}) p(\utwi{\beta})$, about
+its mode, here found through a standard numerical search algorithm. This approximation to the integrand is proportional to a
+Gaussian distribution in $\utwi{\beta}$, allowing the approximated integral to be done analytically. We follow this approach, with $p=1$,
+denoting the resulting statistic KRDQ1.
+
+\subsection{VB approximation to BFVQ statistic}
+\label{sec:vb_derivation}
+The BFVQ statistic in Gerlach et al (2014) (and above) is:
+$$
+\mbox{BFVQ} = \frac{ p({\bf u}|\beta_0=0, \beta_1=1)}{ \int \int p({\bf u}|\beta) p(\beta) d \beta_0 d \beta_1 }
+$$
+The denominator, where $u$ follows an Asymmetric Laplace distribution, is an intractable integral. We propose to approximate a lower bound for this
+integral by the method of VB, which is a novel contribution to the literature.
+
+We begin by restating the Asymmetric Laplace (AL) distribution as a continuous mixture of Gaussian distributions.
+The Bayesian hierarchy is as follows:
+\begin{align}
+\nonumber y_t|\cbeta,w_t,\sigma,\alpha & \sim \cN\clrbracket{\cW_t'\cbeta+\frac{1-2\alpha}{\alpha(1-\alpha)}\sigma w_t,
+\frac{2}{\alpha(1-\alpha)}\sigma^2 w_t}\\
+\nonumber \cbeta &\sim \cN(0,c \cI)\\
+\nonumber p(w_t)&=\exp(-w_t)\\
+p(\sigma)&\propto\frac{1}{\sigma}
+\label{eq:BFVQ_hier}
+\end{align}
+
+For brevity, subsequently the notation $\clrangle{\cdot}$ is employed to denote an expectation under $q(\cdot)$.
+The approximate distribution $q(\cbeta)$ is $\cN(\cmu,\cSigma)$ where \footnote{Derivation is shown in \secref{q_beta}},
+\begin{align}
+\cSigma &=\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\csum\clrangle{\frac{1}{w_t}}\cW_t'\cW_t+\frac{1}{c}\cI}^{-1}\\
+\cmu&=\cSigma\clrbracket{\csum\clrbracket{\frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrangle{\frac{1}{w_t}}y_t-\frac{1-2\alpha}{2}\clrangle{\frac{1}{\sigma}}}\cW_t}
+\end{align}
+
+The approximate distribution $q(\cw)$ can be factorised as independent components such that $q(\cw)=\prod_{t=1}^{T}q(w_t)$, where
+$q(w_t) = \cGIG\clrbracket{\chalf{},\alpha,\beta}$ where,
+\begin{align}
+\alpha_t & =\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2} \\
+\beta_t & = \frac{\caexp}{2}\clrangle{\frac{1}{\sigma^2}}\clrbracket{y_t^2-2y_t\cW_t'\clrangle{\cbeta}+\cW_t'\clrangle{\cbeta\cbeta'}\cW_t}
+\end{align}
+
+The exact VB distribution over $q(\sigma)$, though tractable, is susceptible to numerical problems due to the dependence of the
+normalising constant on the parabolic cylindrical function. Hence, we instead limit $q(\sigma)$ to an Inverse Gamma
+distribution, $IG(a,b)$. In order to obtain the parameters $a,b$ we are required to maximise the following function
+using the given derivatives \footnote{Full derivation is shown in \secref{q_sigma}}.
+
+\begin{align}
+F_\sigma&=(a-T)(\log b-\psi(a))+(b-\gamma)\frac{a}{b}-\delta \frac{a(a+1)}{b^2}-a\log b+\log \Gamma(a)\\
+\frac{\partial F}{\partial a}&=(T-a)\psi^{(1)}(a)-\frac{\gamma}{b}-\frac{\delta(2a+1)}{b^2}+1\\
+\frac{\partial F}{\partial b}&=-\frac{T}{b}+\frac{\gamma a}{b^2}+\frac{2\delta a(a+1)}{b^3}
+\end{align}
+
+The expected log-likelihood of the set of latent variables $\mathcal{L}$ is a lower bound for the
+marginal likelihood. Thus, using the approximate distributions derived, it can be shown that
+\begin{align}
+\nonumber \mbox{LBVQ} = &-\chalf{}\Biggl[T\log\frac{2}{\caexp} +2T(\log b -\psi(a))+q \log (c)-\cmu'\cSigma^{-1}\cmu\\
+\nonumber&+\frac{\caexp}{2}\frac{a(a+1)}{b^2}\sum_{t=1}^{T}\sqrt{\frac{\alpha_t}{\beta_t}}y_t^2+\clrbracket{\frac{(1-2\alpha)^2}{2\caexp}+2}\csum\clrbracket{\sqrt{\frac{\beta_t}{\alpha_t}}+\frac{1}{\alpha_t}}\\
+&-(1-2\alpha)\frac{a}{b}\csum y_t\Biggr]
++\chalf{}\clrbracket{\log|\cSigma|}-\chalf{}\csum\log\alpha_t+\frac{T}{2}+\log \Gamma(a)-a\psi(a)+a
+\end{align}
+is a lower bound \footnote{Full derivation can be seen in \secref{l_bound}}. Exponentiating this bound, and
+employing it as the denominator in BFVQ above yields the statistic denoted VBVQ.
+
+LBVQ, the lower bound for the log-likelihood, will tend to $-\infty$, so the denominator in VBVQ will clearly tend to 0,
+as $c$ tends to $\infty$, since the term $c^{-0.5q}$ is again present; thus the estimate of VBDQ tends to $\infty$ in that case and
+the null will never be rejected.
+
+%$q(\cbeta,\cw, \sigma)=q(\cbeta)q(\cw)q(\sigma)\approx p(\cbeta,\cw, \sigma|\cy)$ where $\cw$ is an extra set of latent variables
+%which will be introduced in \secref{vb_derivation}. As the KL divergence is always positive, $\mathcal{L}(q(\cbeta,\cw, \sigma),\theta)$
+%forms a lower bound. In the M-step this lower bound $\int\int q(\cbeta,\cw, \sigma|\theta^{OLD})\log p(\cbeta,\cw, \sigma,\cy)d\cbeta dz$
+%is maximised w.r.t. the hyper-parameters. The E and M steps are iterated over until convergence. However, since all possible parameters
+%are marginalised over here, there will be no M-step.
+%
+%There exists a closed form solution for $q(\cz_i)$ under VB where $\cz_i$ is the i-th member of the set of latent variables $\cz$.
+%Thus we let $q(\cz_i)=\frac{1}{Z}\exp(E_{q(\cz_{\backslash i})}[p(\cz,\cy)])$ where $\cz_{\backslash i}$ is the set of all
+%latent variables except for the i-th member and $Z$ is the normalising constant. Thus under VB, the approximate distribution
+%is the expectation of the joint probability between all latent variables and the observed values, w.r.t. the other
+%approximate distributions. Since, an approximate distribution on one latent variable depends on the other
+%approximate distributions, this step is iterated until convergence.
+
+To assess the accuracy of the VBVQ method, direct prior simulation can be employed to estimate the marginal likelihood: i.i.d. Monte Carlo
+iterates are simulated from $\cbeta \sim \cN(0,c \cI)$, then employed to produce iterates of the likelihood, $p({\bf u}|\utwi{\beta})$.
+These are simply averaged to produce an estimate of the marginal likelihood. Since the integral is only in two dimensions, this method
+seems to work reasonably consistently in large Monte Carlo samples. The method of Gelfand and Dey (1990) is also employed as
+a reference. This method takes a random walk Metropolis sample from the posterior $p(\utwi{\beta} | {\bf u})$, whose
+iterates are employed to produce iterates of the likelihood $p({\bf u}|\utwi{\beta})$. The average of the inverse of these likelihood iterates, 
+is an estimate of the inverse of the marginal likelihood.
+
+Exactly as for the DQ test, the BFDQ and VBDQ statistics above cannot be conducted when the number of violations equals 0.
+However, this restriction does not affect the VQ, BFVQ or VBVQ tests.
+
+\section{Simulation study}
+The empirical properties of the proposed Bayesian methods are assessed, and compared to existing tests, via a simulation study.
+The simulation setting as in Gaglianone et al. (2011) and Gerlach et al (2014) is employed. The true model is a GARCH(1,1), specified as:
+\begin{eqnarray*}
+\sigma_t^2 = 0.1 + 0.1y_{t-1}^2 + 0.85\sigma_{t-1}^2 \,\,;\,\, y_t = \sigma_t \epsilon_t \,;\, \epsilon_t \sim N(0,1) \\
+\end{eqnarray*}
+where $\mbox{VaR}_{t,\alpha} = \sigma_t \Phi^{-1}(\alpha)$. To assess power an incorrect, but commonly applied, historical simulation (HS)
+VaR estimator is employed in the alternative hypothesis:
+\begin{eqnarray*}
+\mbox{HS}250_{t,\alpha} = \hat{Q}_{\alpha}(y_{t-250},\ldots,y_{t-1})
+\end{eqnarray*}
+using the sample percentile of the last 250 observations as a 1-step-ahead VaR forecast. 25000 replications of data, using a burn-in period of
+$n=250$ observations, followed by forecast sample sizes of $T=250, 500, 1000$ and $2500$ observations, are simulated from this model.
+For each data set, the DQ1, DQ4 and VQR tests are conducted. Further, the BFDQ1, BFDQ4 and BFVQ statistics from Gerlach et al (2014) and
+the proposed VBDQ1, VBDQ4, AQDQ1, KRDQ1 and VBVQ statistics are also calculated for each data set. The choice $c=1000$ is made for all
+the BF statistics. The statistics are all calculated first under the null, using the true $\mbox{VaR}_{t,\alpha}$ series,
+for $t=n+1,\ldots,n+T$, then calculated under the alternative, using the estimated $\mbox{HS}250_{t,\alpha}$ series.
+$\alpha=0.05, 0.01$ are used for the quantile levels, though most interest is in $\alpha=0.01$.
+
+As in Gerlach et al (2014), to compare the methods on an equal footing, size and power as well as empirically adjusted
+size and size-adjusted power are considered. This is standard practice when comparing frequentist tests, but is not standard for Bayesian
+methods; however this will allow direct, objective comparison of all methods considered on an equitable basis. It will also
+allow us to estimate sensible thresholds for the BF statistics, that account for the choice of prior variance $c$ and also for
+the upward bias in BF estimators employing a VB lower bound. For a truly continuous statistic, the adjusted size can always be made
+exactly equal to nominal (here 0.05); this applies to the VQ, BFVQ and VBVQ statistics. However, the DQ-type statistics are subject
+to some discreteness, being based on regressing a binary "hit" series that may have only a few (e.g. 1 or 2) "success" observations on
+mostly binary regressors, also with few "successes"; i.e. there may be only 1 or 2 observed violations, especially when $\alpha=0.01$ and
+$T=250, 500$. In those cases, an exact size adjustment may not be possible. Thus, adjusted size is reported below.
+
+%Without loss of generality, for each of the five BF statistics, we subsequently consider $BF*=BF^{-1}$, and reject the null when $BF*>1$.
+%This simply allowed comparison of the BF statistics with the frequentist tests, for all of which higher values lead to rejection.
+%Thus, all estimated threshold values presented are based on $BF*$; simply taking their reciprocal gives the thresholds for the
+%original BF statistics.
+Table \ref{size5} shows the empirical estimates for size, as well as adjusted size, across the methods employed at
+$\alpha=0.05$ for $T=250,500$. Also shown are the empirical $5\%$ points ("threshold") for all methods, calculated via
+sample percentiles across the 25000 replications for each statistic. These are the thresholds used to calculate the
+empirically adjusted size and size-adjusted power below; i.e. adjusted size is the observed percentage
+of test statistics, across the 25000 replications, that are beyond the empirical $5\%$ threshold calculated under the null hypothesis.
+Size-adjusted power is the same observed percentage, using the same empirical threshold, employing the test statistics calculated under the
+incorrect HS VaR estimator. There is no reason why the value 1 should be the 95th percentage point for the sampling distribution of the
+employed BF statistics, so size for the BF methods is not particularly relevant, but is reported as a reference for comparison.
+Adjusted size is, however, relevant to the comparison of all methods. Since the DQ type tests cannot be run when there are 0 violations,
+all results for methods with DQ in their title below are only for datasets when the violation rate $>0$. When $T=250$ there were 2126
+datasets with 0 violations; for $T = 500$ there were 157 datasets with 0 violations; and for $T \ge 1000$ no 0 violation datasets 
+were generated. The results for methods with VQ in the title are for all 25000 datasets in each case.
+
+\begin{table}[thp]
+\begin{center}
+\caption{Size, empirical threshold and adjusted size for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.05$.
+} \label{size5}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=250} & \multicolumn{3}{c}{T=500}                    \\
+Method  &        Size  &           threshold &   adj. size &         Size &           threshold &  adj. size\\ \hline
+DQ1     &\cblue{0.0538}&               8.018 &\cblue{0.0499}&\cblue{0.0472}&               7.625 & \fbox{0.0500}   \\ [1.3pt]
+BFDQ1   &       0.0007 &  1.247$\times10^{5}$& \fbox{0.0500}&       0.0000 &  5.419$\times10^{5}$&\cblue{0.0499}   \\ [1.3pt]
+VBDQ1   &       0.0000 &  1.846$\times10^{5}$& \fbox{0.0500}&       0.0000 &  6.462$\times10^{5}$& \fbox{0.0500}   \\ [1.3pt]
+KRDQ1   &       0.0010 &              153.73 & \fbox{0.0500}&       0.0002 &             4723.89 & \fbox{0.0500}   \\ [1.3pt]
+AQDQ1   &       0.00004&             1688.67 &\cblue{0.0499}&       0.0000 &              227.42 & \fbox{0.0500}   \\ [1.3pt]
+DQ4     &       0.0647 &              13.777 & \fbox{0.0500}&\cblue{0.0532}&              12.816 & \fbox{0.0500}   \\ [1.3pt]
+BFDQ4   &       0.0005 &  7.581$\times10^{9}$& \fbox{0.0500}&       0.0000 & 1.340$\times10^{11}$& \fbox{0.0500}  \\ [1.3pt]
+VBDQ4   &       0.0000 & 2.820$\times10^{10}$& \fbox{0.0500}&       0.0000 & 1.879$\times10^{11}$& \fbox{0.0500}   \\ [1.3pt]
+VQR     & \fbox{0.0488}&               5.923 & \fbox{0.0500}&\cblue{0.0556}&               6.291 &\cblue{0.0499}   \\ [1.3pt]
+BFVQ    &       0.0654 &               0.362 & \fbox{0.0500}& \fbox{0.0520}&              25.751 & \fbox{0.0500}   \\ [1.3pt]
+VBVQ    &       0.0428 &               2.033 & \fbox{0.0500}&       0.0363 &               3.772 & \fbox{0.0500}   \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ The correct, nominal thresholds are: VQR 5.99; DQ1 7.81; DQ4 12.59}
+\end{center}
+\end{table}
+
+At $T=250$, only the DQ1 and VQR tests achieve close to nominal size, with $5.4\%, 4.9\%$ respectively and empirical thresholds close to
+their nominal values, whilst the DQ4 is quite over-sized and most BF methods are well under-sized (from a frequentist point of view);
+however all methods achieve correct adjusted sizes of (almost or) exactly $5\%$. For $T=500$ the BFVQ, DQ1 and DQ4 tests have the closest to
+nominal size ($5.2\%, 4.7\%, 5.3\%$), followed by VQR; again all methods achieve the corrected adjusted size exactly equal to nominal.
+
+Table \ref{size51} shows the empirical estimates for size and then adjusted size across all the methods employed at $\alpha=0.05$
+for $T=1000,2500$. Also shown are the empirical $5\%$ points for the methods across the 25000
+replications used to calculate the adjusted size and size-adjusted power.
+
+\begin{table}[thp]
+\begin{center}
+\caption{Size, empirical threshold and adjusted size for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.05$.
+} \label{size51}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=1000} & \multicolumn{3}{c}{T=2500}                    \\
+Method   &        Size  &           threshold &   adj. size &        Size  &          threshold  &    adj. size   \\ \hline
+DQ1      &\cblue{0.0448}&               7.566 & \fbox{0.0500}&\cblue{0.0435}&              7.541  & \fbox{0.0500}   \\ [1.3pt]
+BFDQ1    &       0.0000 &  1.247$\times10^{5}$& \fbox{0.0500}&       0.0000 & 8.606$\times10^{6}$ &\cblue{0.0499}   \\ [1.3pt]
+VBDQ1    &       0.0000 &  1.846$\times10^{5}$& \fbox{0.0500}&       0.0000 & 8.439$\times10^{6}$ &\cblue{0.0499}   \\ [1.3pt]
+KRDQ1    &       0.0000 &              153.21 & \fbox{0.0500}&       0.0000 & 1.074$\times10^{6}$ &\cblue{0.0499}   \\ [1.3pt]
+AQDQ1    &       0.0000 &             1688.67 & \fbox{0.0500}&       0.0000 & 1.033$\times10^{7}$ & \fbox{0.0500}  \\ [1.3pt]
+DQ4      & \fbox{0.0494}&              12.552 & \fbox{0.0500}&\cblue{0.0448}&             12.345  & \fbox{0.0500}   \\ [1.3pt]
+BFDQ4    &       0.0000 &  7.581$\times10^{9}$& \fbox{0.0500}&       0.0000 & 3.055$\times10^{13}$& \fbox{0.0500}  \\ [1.3pt]
+VBDQ4    &       0.0000 & 2.820$\times10^{10}$& \fbox{0.0500}&       0.0000 & 2.528$\times10^{13}$& \fbox{0.0500}  \\ [1.3pt]
+VQR      &\cblue{0.0540}&               6.213 & \fbox{0.0500}& \fbox{0.0453}&               5.788 & \fbox{0.0500}  \\ [1.3pt]
+BFVQ     &       0.0450 &               0.362 &\cblue{0.0499}&       0.0210 &              59.075 & \fbox{0.0500}  \\ [1.3pt]
+VBVQ     &       0.0369 &               2.033 & \fbox{0.0500}&       0.0313 &               9.942 & \fbox{0.0500}   \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ The correct, nominal thresholds are UC, IND 3.84; CC, VQ 5.99; DQ1 7.81; DQ4 12.59}
+\end{center}
+\end{table}
+
+At $T=1000$, DQ4 is closest to nominal size with $4.9\%$, while VQR, BFVQ and DQ1 are also reasonably close to nominal size; all methods
+achieve correct adjusted sizes exactly equal to $5\%$. For $T=2500$ the VQR, DQ4 and DQ1 tests have closest to nominal sizes
+($4.53, 4.35\%$ respectively) and for all methods the corrected size is almost exactly the nominal $5\%$ level.
+
+\begin{figure}[thp]
+     \centering
+      \includegraphics[width=1.0\textwidth]{DQvsBFDQ1vsVBDQ_final.png}
+\caption{\label{powerDQBF250} Minus the logarithm of the VBDQ1 (dark grey diamond) and BFDQ1 (light grey asterisk) and logarithm of the
+DQ1 (black square) statistics, plot against number of violations under the HS quantile estimator, $T=250$; (a) $\alpha =5\%$; 
+(b) $\alpha =1\%$. The horizontal lines are minus the logarithm of the empirical 5\% points of the VBDQ1 (dark grey), BFDQ1 (light grey), 
+and logarithm of the 95\% threshold of the DQ1, statistics.}
+\end{figure}
+
+Tables \ref{power51} - \ref{power52} show the empirical estimates for power and size-adjusted power (SAP) across the methods
+employed at $\alpha=0.05$. At $T=250$ Gerlach et al (2014) found that the BFDQ1 was marginally more powerful, size-adjusted, than
+the DQ1 and DQ4 tests; the result is replicated here. However, the proposed VBDQ1 statistic outperforms all tests with the highest
+SAP here. To examine this result in more detail, consider Figure \ref{powerDQBF250}(a), showing minus the logarithm of
+the VBDQ1 and BFDQ1 statistics and the logarithm of the DQ1 statistic, plot against the number of violations under the alternative hypothesis;
+i.e. under the HS model. All three methods show U-shaped behavior in the locations of the distributions against violation numbers. 
+As expected, all three methods reject the null for very low and very high numbers of violations; i.e. compared to the mean of 12.5 
+violations at $\alpha=0.05$, $T=250$ under the null. However, all three tests also have plenty of rejections for violation numbers 
+close to expected (e.g. (9,15)): likely rejecting violation series showing "significant" serial dependence. 
+Gerlach et al (2014) found that the extra power of BFDQ1 over DQ1 is achieved through rejecting many more series when the number of 
+violations is comparatively low, specifically for 3-15 violations; the DQ1 has more rejections than BFDQ1 when 16-27 violations are 
+observed, but the differences in rejection frequencies for these higher violations are much smaller than
+they are for 3-15 violations; as illustrated in Figure \ref{pdqBF250}(a), showing the rates of rejection at each number of violations for the
+three methods. Here the superior size-adjusted power of the VBDQ1 is well illustrated: from 1-15 violations the VBDQ1 mimics, or exceeds, the
+higher rejection rates of the BFDQ1 test, compared to the DQ1 test; whilst from 16-31 violations the VBDQ1 mimics, or is just below,
+the higher rejection rates achieved by the DQ1 test, compared to the BFDQ1 test. For violation numbers of 1,2 or those higher than 30 
+all three methods almost always reject the null. Thus, at $T=250$ and $5\%$ VaR forecasting, the VBDQ1 and BFDQ1 tests
+appear to have much higher power than the DQ1 at detecting dependence in the violation series when the number of 
+violations is relatively small ($\sim 3-15$ violations for VBDQ1), however the VBDQ1 and DQ1 statistics have similarly higher 
+size-adjusted power than the BFDQ1 when the number of violations is relatively large (16-31 violations); thus contributing to an 
+overall much higher size adjusted power in Table \ref{power5} when $T=250$ for the VBDQ1 method.
+
+The VBDQ1 method also has much higher SAP than the KRDQ1, AQDQ1, VBVQ, BFVQ and VQR tests at $T=250$.
+The values of SE (most $\approx 0.003$), thanks to 25000 replications, roughly suggest that only very, very small pairwise differences in 
+SAP will be significant at a $5\%$ level. At the suggestion of a referee, we run all pairwise likelihood ratio (LR) tests for 
+equality of size-adjusted power. The details of the test are in an appendix. There are 55 unique pairs among the 11 methods. 
+None of the 55 associated tests for equal SAP has a p-value $> 0.05$, in fact 54 of the p-values are $\approx 0$, suggesting 
+clear statistically significantly differences. The highest p-value is for the difference between DQ1 and DQ4's SAP 
+(p-val = 0.018, difference = 0.0085). In particular, the top three ranked methods, VBDQ1, VBDQ4 and BFDQ1 are all statistically different 
+to each other, and to all eight other methods, in terms of size-adjusted power with p-values $= 0$ to the precision of Matlab on my PC.
+
+\begin{table}%[thp]
+\begin{center}
+\caption{Power and size-adjusted power for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.05$ and $T=250, 500$.
+}\label{power51}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=250} & \multicolumn{3}{c}{T=500}                   \\
+Method   &      Power  &   Size-adj. &   SE   &       Power &   Size-adj. &    SE         \\ \hline
+DQ1      &       0.358 &       0.346 & 0.0030 &\cblue{0.449}&       0.462 & 0.0032 \\ [1.3pt]
+BFDQ1    &       0.019 &\cblue{0.420}& 0.0031 &       0.007 &\cblue{0.505}& 0.0032 \\ [1.3pt]
+VBDQ1    &       0.002 & \fbox{0.478}& 0.0032 &       0.001 & \fbox{0.533}& 0.0032 \\ [1.3pt]
+KRDQ1    &       0.018 &       0.203 & 0.0025 &       0.013 &       0.170 & 0.0024 \\ [1.3pt]
+AQDQ1    &       0.003 &       0.167 & 0.0024 &       0.003 &       0.179 & 0.0024 \\ [1.3pt]
+DQ4      &       0.381 &       0.337 & 0.0030 & \fbox{0.513}&\cblue{0.503}& 0.0032 \\ [1.3pt]
+BFDQ4    &       0.008 &       0.365 & 0.0030 &       0.002 &\cblue{0.515}& 0.0032 \\ [1.3pt]
+VBDQ4    &       0.000 &\cblue{0.448}& 0.0031 &       0.000 &\cblue{0.495}& 0.0032 \\ [1.3pt]
+VQR      &       0.159 &       0.161 & 0.0023 &       0.275 &       0.265 & 0.0028 \\ [1.3pt]
+BFVQ     &       0.328 &       0.289 & 0.0029 &\cblue{0.367}&       0.356 & 0.0030 \\ [1.3pt]
+VBVQ     &       0.362 &       0.387 & 0.0031 &\cblue{0.373}&       0.423 & 0.0031 \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ SE is $\sqrt{\frac{p(1-p)}{25000}}$, where $p$ is size-adjusted power.}
+\end{center}
+\end{table}
+
+\begin{table}%[thp]
+\begin{center}
+\caption{Power and size-adjusted power for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.05$ and $T=1000, 2500$.
+}\label{power52}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=1000} & \multicolumn{3}{c}{T=2500}                   \\
+Method   &       Power &  Size-adj.  &   SE   &       Power &    Size-adj. &   SE    \\ \hline
+DQ1      &\cblue{0.628}&\cblue{0.644}& 0.0030 &\cblue{0.944}&\cblue{0.950} & 0.0014 \\ [1.3pt]
+BFDQ1    &       0.010 &\cblue{0.681}& 0.0030 &       0.045 &\cblue{0.956} & 0.0013 \\ [1.3pt]
+VBDQ1    &       0.002 &\cblue{0.651}& 0.0030 &       0.025 &\cblue{0.957} & 0.0013 \\ [1.3pt]
+KRDQ1    &       0.007 &       0.265 & 0.0030 &       0.032 &       0.899  & 0.0019 \\ [1.3pt]
+AQDQ1    &       0.005 &       0.355 & 0.0030 &       0.036 &       0.864  & 0.0022 \\ [1.3pt]
+DQ4      & \fbox{0.705}&\cblue{0.706}& 0.0029 &\fbox{0.966}& \fbox{0.969} & 0.0011 \\ [1.3pt]
+BFDQ4    &       0.003 & \fbox{0.713}& 0.0029 &       0.017 & \fbox{0.969} & 0.0011 \\ [1.3pt]
+VBDQ4    &       0.000 &\cblue{0.629}& 0.0030 &       0.003 &\cblue{0.960} & 0.0012 \\ [1.3pt]
+VQR      &       0.484 &       0.468 & 0.0032 &       0.875 &       0.886  & 0.0020 \\ [1.3pt]
+BFVQ     &\cblue{0.421}&       0.442 & 0.0031 &       0.768 &       0.902  & 0.0019 \\ [1.3pt]
+VBVQ     &       0.522 &       0.578 & 0.0031 &       0.883 &\cblue{0.926} & 0.0017 \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ SE is $\sqrt{\frac{p(1-p)}{25000}}$, where $p$ is size-adjusted power.}
+\end{center}
+\end{table}
+
+At $T=500$, the five methods with highest size-adjusted power for 5\% quantile forecasting are: VBDQ1, BFDQ4, BFDQ1, DQ4 and the VBDQ4 test
+with $\sim 50-53\%$. The VBDQ1 is only marginally preferred here and the top five tests are very close in size-adjusted power (SAP).
+The BFDQ4 (BFDQ1) test rejects more often than the DQ4 (DQ1) test when the number
+of violations is between 8 and 27 (12 and 28; 25 violations are expected at $\alpha=0.05, T=500$), whilst the DQ4 rejects more for
+28-46 (DQ1 for 29-42) violations: again the BFDQ statistics have slightly more power to detect dependent violations at lower numbers of
+violations, compared to the DQ tests; however, in this case things even out so that the BFDQ and DQ method's size-adjusted powers
+are close to comparable in each case. The VBDQ1 method has rejection rates similar to those of the BFDQ1 for lower violations and 
+closer to that of the DQ1 for higher violations, allowing it to have marginally the highest SAP overall. The 55 pairwise tests for equality
+of size-adjusted power yield 54 p-values $\approx 0$ (highest is $0.001$), with only the difference between BFDQ1 and DQ4 giving an
+insignificant p-value of $0.49$ (observed difference $0.002$). The VBDQ1 has SAP that is significantly different to all other tests.
+
+For $T=1000$, the DQ and VQR tests have close to nominal size, so their SAPs and power are very similar. Overall, the BFDQ4
+has marginally the highest SAP ($\approx 71\%$), followed closely by the DQ4 and BFDQ1, then
+VBDQ1 and DQ1 methods. The pairwise tests for equality of size-adjusted power yield all 55 p-values $\approx 0$, highest 
+p-value $6.86 \times 10^{-5}$. Figure \ref{pdq1000} shows rejection rates for the VBDQ1, BFDQ1, BFDQ4, DQ1 and DQ4 methods.
+The BFDQ4 (BFDQ1) test rejects more than the DQ4 (DQ1) test when the number of violations is between
+33 and 52 (33 and 55; 50 violations are expected), whilst the DQ4 (DQ1) rejects more than the BFDQ4 (BFDQ1) for 53-72 (DQ1 for 56-71)
+violations: again the BFDQ statistics have slightly more power to detect correlation in violations at lower numbers of violations, 
+compared to the DQ tests, with the result reversed for higher violation numbers. The VBDQ1 method has rejection rates marginally lower than
+those of the BFDQ1 for most violations (36 to 63) and closer to that of the DQ1 for a small number of higher violations (64-69),
+meaning it overall has marginally lower size-adjusted power than the BFDQ and DQ tests here. Figure \ref{pvq1000} shows rejection
+rates for the VBVQ, BFVQ and VQR methods, plot (a) is for $5\%$. Clearly, at almost all violation numbers the VBVQ has a
+marginally higher rejection rate than BFVQ and VQR, whilst BFVQ is superior to VQR up until 50 violations, but inferior at higher 
+violation numbers, 51-65, then BFVQ again outperforms VQR for higher violations.
+
+For $T=2500$, similar results to $T=1000$ are obtained, but with a marked increase in SAP for all the
+methods. Now the BFDQ4 and DQ4 methods have equal highest SAP, $\approx 97\%$, followed closely by VBDQ4, VBDQ1, BFDQ1 and DQ1 tests, all with
+SAP $\in 0.95-0.96$. The pairwise tests for equality of size-adjusted power yield 52 p-values $<0.05$, with 50 $\approx 0$. The
+difference between the top ranked BFDQ4 and DQ4 has a p-value $=1$ to the precision of Matlab. The other insignificant differences are for
+the pairs BFVQ and AQDQ1 (p-val $0.227$, observed difference $0.003$) and BFDQ1 and VBDQ1 (p-val $0.103$, observed difference $0.001$).
+
+\begin{figure}%[htp]
+     \centering
+      \includegraphics[width=0.8\textwidth]{pdqBFVB250_final.png}
+\caption{\label{pdqBF250} Rates of rejection for the VBDQ1 (dark grey diamond), BFDQ1 (light grey asterisk) and DQ1 (black square) statistics,  
+for each number of violations under the HS quantile estimator, $T=250$; (a) $\alpha =5\%$; (b) $\alpha =1\%$.}
+\end{figure}
+
+In summary for 5\% quantile forecasting: the VBDQ method is clearly and significantly superior for lower sample sizes of $T=250, 500$, and is
+highly competitive for $T=1000, 2500$, regarding SAP. At these higher sample sizes, the BFDQ4 and DQ4 are marginally favoured, followed
+by the VBDQ1, VBDQ4 and BFDQ1 tests. The out-performance in SAP for the VBDQ1 when $T \le 500$ is attributable to more
+accurate detection of dependence in violations from the HS estimator, when the observed violation numbers were comparatively
+small, compared to the DQ statistics, and simultaneously higher power than the BFDQ methods for comparatively higher violation numbers.
+Further, the VBVQ method had significantly higher size-adjusted power than the BFVQ test and always had higher size-adjusted
+power than the VQR test.
+
+Table \ref{size1} shows the empirical estimates for size and then adjusted size across all the methods employed at $\alpha=0.01$ for
+$T=250, 500$. Also shown are the empirical $5\%$ points for the methods. Again, empirical size for the BF methods is only reported as a
+reference for comparison.
+
+\begin{table}
+\begin{center}
+\caption{Size, empirical threshold and adjusted size for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.01$.
+} \label{size1}
+\begin{tabular}{lcccccccccccc}
+\hline
+ & \multicolumn{3}{c}{T=250} & \multicolumn{3}{c}{T=500}      \\
+Method   &        Size  &          threshold &    adj. size &       Size  &           threshold &  adj. size    \\ \hline
+DQ1      & \fbox{0.0600}&              9.164 &\cblue{0.0499}&      0.0727 &              12.202 & \fbox{0.0500} \\ [1.3pt]
+BFDQ1    &       0.0039 & $3.411\times10^{5}$&\cblue{0.0499}&      0.0025 &             3766.82 & \fbox{0.0500} \\ [1.3pt]
+VBDQ1    &       0.0000 & $3.184\times10^{5}$& \fbox{0.0500}&      0.0000 &  5.701$\times10^{5}$& \fbox{0.0500} \\ [1.3pt]
+KRDQ1    &       0.0001 &             20.839 & \fbox{0.0500}&      0.0024 &              10.154 &\cblue{0.0499} \\ [1.3pt]
+AQDQ1    &       0.0000 &             875.57 &\cblue{0.0499}&      0.0000 &             1053.38 & \fbox{0.0500} \\ [1.3pt]
+DQ4      &       0.1128 &             28.657 &\cblue{0.0499}&      0.1691 &              21.411 & \fbox{0.0500} \\ [1.3pt]
+BFDQ4    &       0.0110 & $2.633\times10^{8}$&\cblue{0.0499}&      0.0093 &  7.524$\times10^{7}$& \fbox{0.0500} \\ [1.3pt]
+VBDQ4    &       0.0000 &$1.200\times10^{10}$&       0.0498 &      0.0000 & 2.578$\times10^{10}$& \fbox{0.0500} \\ [1.3pt]
+VQR      &\cblue{0.0744}&              8.535 & \fbox{0.0500}&\fbox{0.0419}&               5.245 & \fbox{0.0500} \\ [1.3pt]
+BFVQ     &       0.3783 &$1.725\times10^{-9}$&       0.0498 &      0.3397 &7.960$\times10^{-10}$&\cblue{0.0499} \\ [1.3pt]
+VBVQ     &       0.3168 &$5.002\times10^{-9}$&\cblue{0.0499}&      0.2910 & 1.581$\times10^{-9}$& \fbox{0.0500} \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ The correct, nominal thresholds are: VQR 5.99; DQ1 7.81; DQ4 12.59}
+\end{center}
+\end{table}
+
+At $T=250$, the DQ1 test achieves closest to the true nominal size, with $6\%$, while the VQR and DQ4 are well over-sized.
+Only the VQR and VBVQ1 tests achieve correct adjusted sizes of $5\%$; though the others are only very marginally under-sized.
+For $T=500$, the DQ1 and DQ4 are both over-sized, the VQR is under-sized and no method is very close to the nominal level.
+Table \ref{size11} shows the empirical estimates for size and then adjusted size across all the methods employed at
+$\alpha=0.01$ for $T=1000,2500$. Also shown are the empirical $5\%$ points for the methods across the 25000
+replications used to calculate the adjusted size and size-adjusted power.
+
+\begin{table}
+\begin{center}
+\caption{Size, empirical threshold and adjusted size for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.01$.
+} \label{size11}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=1000} & \multicolumn{3}{c}{T=2500}                    \\
+Method   &        Size  &          threshold  &    adj. size &        Size  &           threshold &   adj. size    \\ \hline
+DQ1      &\cblue{0.0802}&              9.505  & \fbox{0.0500}&\cblue{0.0582}&               8.534 & \fbox{0.0500}   \\ [1.3pt]
+BFDQ1    &       0.0032 & 3.073$\times10^{5}$ & \fbox{0.0500}&       0.0003 &  2.954$\times10^{6}$&\cblue{0.0499}   \\ [1.3pt]
+VBDQ1    &       0.0000 & 1.808$\times10^{6}$ & \fbox{0.0500}&       0.0000 &  7.679$\times10^{6}$& \fbox{0.0500}   \\ [1.3pt]
+KRDQ1    &       0.0003 &             365.249 & \fbox{0.0500}&       0.0000 &             7876.47 &\cblue{0.0499}   \\ [1.3pt]
+AQDQ1    &       0.00004&             3384.83 & \fbox{0.0500}&       0.0000 &            11461.53 & \fbox{0.0500}   \\ [1.3pt]
+DQ4      &       0.1045 &             16.645  & \fbox{0.0500}&       0.1038 &              15.495 & \fbox{0.0500}   \\ [1.3pt]
+BFDQ4    &       0.0022 & 1.263$\times10^{9}$ & \fbox{0.0500}&       0.0002 & 3.708$\times10^{11}$& \fbox{0.0500}   \\ [1.3pt]
+VBDQ4    &       0.0000 & 4.319$\times10^{11}$& \fbox{0.0500}&       0.0000 & 5.647$\times10^{12}$& \fbox{0.0500}   \\ [1.3pt]
+VQR      & \fbox{0.0406}&              5.177  & \fbox{0.0500}& \fbox{0.0473}&               5.772 & \fbox{0.0500}   \\ [1.3pt]
+BFVQ     &       0.2971 &8.438$\times10^{-10}$& \fbox{0.0500}&       0.2390 & 5.036$\times10^{-8}$& \fbox{0.0500}   \\ [1.3pt]
+VBVQ     &       0.2466 &2.001$\times10^{-9}$ & \fbox{0.0500}&       0.1667 & 9.025$\times10^{-8}$& \fbox{0.0500}   \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ The correct, nominal 5\% thresholds are: VQ 5.99; LR1, DQ1 7.81; DQ4 12.59}
+\end{center}
+\end{table}
+
+At $T=1000$, again no method is close to the nominal 5\% level: DQ1, DQ4 are over and VQR is under-sized; all methods
+have exactly nominal adjusted size. For $T=2500$ the VQR test has the closest to nominal size ($4.9\%$), whilst
+all methods achieve an adjusted size exactly equal to nominal.
+
+\begin{figure}[thp]
+     \centering
+      \includegraphics[width=1.0\textwidth]{pdq1000_final.png}
+\caption{\label{pdq1000} Rejection rates for the VBDQ1 (dark grey diamond), BFDQ1 (medium grey circle), BFDQ4 (light grey circle),
+DQ1 (black square) and DQ4 (grey square) statistics against number of violations under the HS quantile estimator at $T=1000$;
+(a) 5\% HS; (b) 1\% HS.}
+\end{figure}
+
+\begin{figure}%[htp]
+     \centering
+      \includegraphics[width=0.8\textwidth]{pvq1000.png}
+\caption{\label{pvq1000} Rates of rejection for the VBVQ (dark grey diamond), BFVQ (light grey circle) and VQR (black square)
+statistics against the number of violations under the HS quantile estimator at $T=1000$; (a) 5\% HS; (b) 1\% HS.}
+\end{figure}
+
+Table \ref{power1} shows the empirical estimates for power and size-adjusted power, as well as the estimated standard errors for
+size-adjusted power, across all the methods at $\alpha=0.01$. At $T=250$ two methods stand out regarding size-adjusted power: VBDQ1 and BFDQ1;
+VBVQ is next best with $\approx 39\%$ and DQ1 is next with $\approx 34\%$. To examine power in more detail, consider
+Figure \ref{powerDQBF250}(b), showing minus the logarithm of the VBDQ1, BFDQ1 statistics and the logarithm of the DQ1 statistic, 
+plot against the number of violations under the alternative hypothesis. As is logical, with an expected number of only 2.5 
+violations under the null, all methods always reject the HS estimator only for very high numbers of violations (e.g. 8 and above for DQ1, 
+VBDQ1, 12 and above for BFDQ1).
+Gerlach et al (2014) found the comparative strong performance of BFDQ1 is due to a much higher rate of model rejection for
+low violation numbers, here 1-4, as shown in Figure \ref{pdqBF250}(b) (comparing VBDQ1, BFDQ1 and DQ1 in terms of rejection rates
+against number of violations), all of which occur highly frequently at $T=250$ and 1\% HS forecasting. The DQ1 has higher power than
+BFDQ1 at 5-11 violations, but these violation numbers are far less likely to occur at $T=250$. The VBDQ1 test mimics the 
+higher rejection rates of BFDQ1 for 1-4 violations, and also mimics the higher rejection rates of DQ1 for 5-11 violations, thus ensuring 
+it is significantly higher in SAP than both DQ1 and BFDQ1 in this case. We run all 55 pairwise
+likelihood ratio tests for equality of SAP: 53 of these tests had p-values $\approx 0$, suggesting clear
+statistically significantly different SAPs, with the differences between VBDQ4 and VBVQ (p-val $= 0.15$) and between BFDQ4 and BFVQ
+(p-val $= 0.26$) in SAPs being insignificant from 0.
+
+
+%\begin{footnotesize}
+\begin{table}
+\begin{center}
+\caption{Power and size-adjusted power for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.01$ and $T=250, 500$.
+}\label{power11}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{T=250} & \multicolumn{3}{c}{T=500}                   \\
+Method   &     Power   &  Size-adj.  &   SE   &       Power &  Size-adj.  &  SE  \\ \hline
+DQ1      &\cblue{0.384}&       0.344 & 0.0030 &\cblue{0.468}&       0.357 & 0.0030 \\ [1.3pt]
+BFDQ1    &       0.042 &\cblue{0.475}& 0.0032 &       0.034 &       0.131 & 0.0021 \\ [1.3pt]
+VBDQ1    &       0.001 & \fbox{0.509}& 0.0032 &       0.0001& \fbox{0.447}& 0.0031 \\ [1.3pt]
+KRDQ1    &       0.013 &       0.146 & 0.0022 &       0.025 &       0.123 & 0.0021 \\ [1.3pt]
+AQDQ1    &       0.003 &       0.188 & 0.0025 &       0.004 &       0.216 & 0.0026 \\ [1.3pt]
+DQ4      &\cblue{0.443}&       0.293 & 0.0029 &\cblue{0.629}&\cblue{0.420}& 0.0031 \\ [1.3pt]
+BFDQ4    &       0.050 &       0.279 & 0.0028 &       0.047 &       0.256 & 0.0028 \\ [1.3pt]
+VBDQ4    &       0.000 &\cblue{0.372}& 0.0031 &       0.000 &       0.340 & 0.0030 \\ [1.3pt]
+VQR      &       0.104 &       0.074 & 0.0017 &       0.063 &       0.071 & 0.0016 \\ [1.3pt]
+BFVQ     &\cblue{0.688}&       0.255 & 0.0028 &\cblue{0.804}&       0.343 & 0.0030 \\ [1.3pt]
+VBVQ     &\cblue{0.751}&\cblue{0.385}& 0.0031 & \fbox{0.805}&\cblue{0.420}& 0.0031 \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ SE is $\sqrt{\frac{p(1-p)}{25000}}$, where $p$ is size-adjusted power.}
+\end{center}
+\end{table}
+%\end{footnotesize}
+
+\begin{table}
+\begin{center}
+\caption{Power and size-adjusted power for nominal 5\% tests of 1-step-ahead quantile forecasts at $\alpha=0.01$ and $T=1000, 2500$.
+}\label{power12}
+\begin{tabular}{lcccccc}
+\hline
+  \multicolumn{3}{c}{T=1000} & \multicolumn{3}{c}{T=2500}                   \\
+Method   &     Power   &  Size-adj.  &   SE   &       Power &  Size-adj.  &    SE    \\ \hline
+DQ1      &\cblue{0.666}&\cblue{0.577}& 0.0031 &\cblue{0.933}&\cblue{0.913}& 0.0018 \\ [1.3pt]
+BFDQ1    &       0.029 &       0.370 & 0.0031 &       0.056 &       0.832 & 0.0024 \\ [1.3pt]
+VBDQ1    &       0.001 &\cblue{0.615}& 0.0031 &       0.010 &\cblue{0.935}& 0.0016 \\ [1.3pt]
+KRDQ1    &       0.015 &       0.276 & 0.0028 &       0.039 &       0.675 & 0.0030 \\ [1.3pt]
+AQDQ1    &       0.006 &       0.412 & 0.0031 &       0.041 &       0.759 & 0.0027 \\ [1.3pt]
+DQ4      &\cblue{0.757}&\cblue{0.618}& 0.0031 &\cblue{0.950}&\cblue{0.913}& 0.0018 \\ [1.3pt]
+BFDQ4    &       0.036 &       0.356 & 0.0030 &       0.050 &       0.821 & 0.0024 \\ [1.3pt]
+VBDQ4    &       0.000 & \fbox{0.637}& 0.0030 &       0.0002&\cblue{0.943}& 0.0015 \\ [1.3pt]
+VQR      &       0.151 &       0.170 & 0.0024 &       0.562 &       0.572 & 0.0031 \\ [1.3pt]
+BFVQ     & \fbox{0.909}&\cblue{0.559}& 0.0031 & \fbox{0.992}& \fbox{0.953}& 0.0013 \\ [1.3pt]
+VBVQ     &\cblue{0.880}&\cblue{0.587}& 0.0031 &\cblue{0.983}&\cblue{0.928}& 0.0016 \\ [1.3pt]
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{.9\textwidth}{ SE is $\sqrt{\frac{p(1-p)}{25000}}$, where $p$ is size-adjusted power.}
+\end{center}
+\end{table}
+
+Gerlach et al (2014) found that the performance of the BFDQ1, BFDQ4 methods compared unfavourably with that of
+DQ1, DQ4 for $T>250$; our results concur with that. However, the VBDQ1 statistic has no such poor comparison.
+For $T=500$, the method with highest SAP is the VBDQ1 ($45\%$), followed by the
+DQ4 and VBVQ ($42\%$ SAP). In this case, the BFDQ1 and BFDQ4 statistics out-performed the DQ1 and DQ4 respectively
+only when 1-4 violations were observed, but these are not very likely when $T=500$ at $\alpha=1\%$ forecasting, and the
+out-performance of the DQ statistics for the more frequently occurring violation numbers of 5-12 was enough to
+overall clearly out-perform both BFDQ statistics here. Again the VBDQ1 statistic mimicked the higher rejection
+rates of the DQ1 and DQ4 statistics for higher numbers of violations, and the higher rejection rates of the BFDQ1 for smaller
+numbers of violations, ensuring it was the best method re SAP overall. The pairwise tests for equality of size-adjusted
+power yielded 53 p-values $<0.05$ and $\approx 0$, with 61 of these $\approx 0$ (highest of these $0.0046$), with only the two
+differences between DQ4 and VBVQ and between VBDQ4 and VBVQ giving insignificant p-values of $0.82, 0.33$ respectively (observed differences
+$0.0008, 0.003$ respectively).
+
+At $T=1000$ the VBDQ4 test has the highest SAP, closely followed by the VBDQ1 and DQ4 statistics. The pairwise tests for equality
+of SAP yield 54 p-values $\approx 0$ (highest 0.0025), with only the difference between VBDQ1 and DQ4 being
+insignificant, with p-value $0.273$. The test of equality between the top-ranked VBDQ4 and DQ4 SAPs has p-value $0$. Figure \ref{pvq1000}
+plot (b) shows rejection rates for the VBVQ, BFVQ and VQR methods, for $1\%$ VaR forecasting. Clearly, at almost all violation numbers 
+both the VBVQ and BFVQ have comparable and much higher rejection rates compared to the VQR test, with the VBVQ having marginally 
+higher SAP than the BFVQ at most violation numbers.
+
+At $T=2500$ the BFVQ test recorded the highest SAP with 95\%, closely followed by the VBDQ4 method with 94\%, then
+the VBDQ1 and VBVQ, with $\sim 92-93\%$. The pairwise tests for equality of size-adjusted
+power yielded 54 p-values $<0.05, \approx 0$ (highest of these $0.00006$), and only the difference between
+DQ1 and DQ4 is insignificant, with p-value $0.85$ (observed difference $0.00006$).
+The test of equality between the top-ranked BFVQ and VBDQ4 SAPs has a p-value
+of $2.62 \times 10^{-7}$. At all sample sizes except $T=2500$, the VBVQ method had higher
+size-adjusted power than the BFVQ method, and it always had much higher size-adjusted power than the VQR test.
+
+Overall, for 1\% quantile forecasting, the results clearly favour the VBDQ1 method for $T \le 500$. At $T=1000$ the VBDQ4 test is marginally
+favoured over the DQ4 and VBDQ1 methods, which still perform strongly. Finally, at $T=2500$, the BFVQ method is favoured regarding
+size-adjusted power, closely followed by the VBDQ4, then the VBVQ1, DQ1 and DQ4 methods.
+
+When comparing the VB or BF version of each test with its frequentist counterpart (e.g. VBDQ vs BFDQ1 vs DQ1, etc),
+at the 5\% quantile level the results are very clear: at each sample size $T$ the Bayesian versions of the test had
+higher size-adjusted power, often only marginally but sometimes much, much higher, than its frequentist competitor, for all the
+tests considered (except VQR, BFVQ at $T=1000$). This is a very strong and clear result in favour of the Bayesian methods. Further,
+the VBVQ method always out-performed the BFVQ, whilst the VBDQ method out-performed the BFDQ1 method for $T \le 500$.
+
+For 1\% quantile forecasting, the comparison is not so clear: while the results clearly favour the VBDQ method for
+$T \le 500$, at $T=1000$ the DQ4 test is marginally favoured over the VBDQ method. Finally, at $T=2500$, the
+BFVQ method is favoured regarding size-adjusted power, followed closely by both the DQ and VB methods. However, the
+VBVQ method always had higher size-adjusted power than the VQR test. Further, the VBVQ method outperformed the BFVQ for $T \le 1000$,
+while the VBDQ always had higher size-adjusted power than its BFDQ1 counterpart.
+
+\subsection{Accuracy of VB approximations}
+Marginal likelihood estimates are typically hard to assess for accuracy, since the quantity is generally intractable analytically.
+
+For the BF statistics based on the VQ regression, the integral is only in two dimensions, so fairly simple methods can be employed to get reliable,
+accurate estimates of the marginal likelihood. The integral ${ \int \int p({\bf u}|\utwi{\beta}) p(\utwi{\beta}) d \beta_0 d \beta_1 }$ is simply
+$E [ p({\bf u}|\utwi{\beta}) ]$ over the prior distribution. A simulation estimate is then
+$$
+{ \int \int p({\bf u}|\utwi{\beta}) p(\utwi{\beta}) d \beta_0 d \beta_1 } \approx \frac{1}{J} \sum_{j=1}{J} p({\bf u}|\utwi{\beta}^{[j]}) \,\, ,
+$$
+where $\utwi{\beta}^{[j]}$ is simulated directly from $p(\utwi{\beta}) \sim N(0,cI)$. An acceptable level of MC error in this estimate
+is achieved when $J=200000$; this estimator is denoted simVQ. A second estimate, denoted MetVQ, employs the Metropolis method to
+simulate an MCMC sample from the posterior; Gelfand and Dey (1990) illustrated that:
+$$
+$$
+estimates the marginal likelihood required. The estimator may have infinite variance and be unstable due to the inverse densities
+involved; however, in the case the estimator seems to have stable, good properties and thus is used as a second comparison method.
+
+Table xxx illustrates some statistics regarding the VBVQ, BFVQ, MetVQ and simVQ statistics, estimated over xx samples of data simulated
+from the model:
+\begin{eqnarray*}
+\sigma_t^2 = 0.1 + 0.1y_{t-1}^2 + 0.85\sigma_{t-1}^2 \,\,;\,\, y_t = \sigma_t \epsilon_t \,;\, \epsilon_t \sim N(0,1) \\
+\end{eqnarray*}
+where $\mbox{VaR}_{t,\alpha} = \sigma_t \Phi^{-1}(\alpha)$. Table yyy shows the size-adjusted power of these methods.
+
+Figure xxx  shows ...  Clearly, the entire distribution of the BF statistics is shifted by the VB estimator giving a lower bound.
+However, the VB method seems to give a more stable, reliable estimate, leading to a more (size-adjusted) powerful test, that can be calculated
+in a smaller time. The AQ and KR approximations give more accurate estimates of the marginal likelihood on average, but their inherent
+approximation error leads to lower power BF tests.
+
+
+
+For the BF statistics based on probit regression, VBDQ1, AQDQ1, KRDQ1, the associated accuracy of the marginal likelihood estimates is
+particularly challenging to assess. The gold standard in this model for marginal likelihood estimation is the method of Chib (1995), which
+exploits the fact that the marginal likelihood is the ratio of the posterior to the likelihood, which can be evaluated at any value of
+the parameters. This method relies on an MCMC sample from the probit regression model, to estimate the posterior mean of $\beta$, integrate out
+the latent series $y*$, and .... The MCMC sample needs many iterates, especially when the number of violations is a small proportion
+of $T$: always the case when $\alpha=0.01$. The method is not exact and has simulation or Monte Carlo (MC) error. To facilitate its accuracy,
+we start the MCMC sample at the posterior mode, however 20000 iterates are still needed to achieve an acceptable level of MC error.
+
+Table xxx illustrates some statistics regarding the VBDQ1, AQDQ1, KRDQ1, ChibDQ1 statistics, estimated over the same xx samples of data as above.
+Table yyy shows the size-adjusted power of these methods.
+
+Figure xxx  shows ...
+
+
+
+%\section{Discussion}
+%When detecting the incorrect HS estimator of 1\% and 5\% quantiles using a range of competing tests/methods, fairly similar stories can be told at
+%each quantile level. First, the VBDQ method is almost always prevalent at or near the top of the rankings regarding size-adjusted power.
+%On the contrary, the VQR method always performed towards the bottom on this aspect. The reported performance of the VQR test
+%in terms of size-adjusted power is slightly worse than the results in Gaglianone et al. (2011), though
+%nearly comparable, but agree with those in Gerlach et all (2014).
+
+%The relatively poor performance of the VQR, compared to the BFVQ, test bears more examination. Figure \ref{VQ1000} shows two times the
+%logarithm of the BFVQ (upper) and VQ (lower) test statistics, plot against the number of violations, under the null hypothesis (black circles)
+%and also under the HS quantile estimator (grey diamonds), at $n=1000$. Also shown are two times the logarithm of the
+%empirical 5\% points of the BFVQ (upper) and VQR (lower) statistics; points above these lines represent rejections of the null hypothesis.
+%It is immediately apparent that slightly more violations tend to occur under the HS estimator than under the null, the latter having a distribution
+%shifted to the right compared to the former (the ratio of means is 1.34 as mentioned previously). Further, it is clear that the BFVQ
+%statistic has a clearly distinguished distribution of values, typically higher, under the HS estimator (grey diamonds) compared to that
+%under the null; this leads to the observed 55.7\% size-adjusted power of the BFVQ method. On the contrary, the VQR test statistic does not
+%have a clearly distinguished distribution of values under the HS estimator compared to that the null, leading to its very low size adjusted power
+%(17.4\%). Similar plots, not shown, occur at $n=250, 500, 2500$.
+%
+%\begin{figure}%[htp]
+%     \centering
+%      \includegraphics[width=0.95\textwidth]{VQ1000.png}
+%\caption{\label{VQ1000} Two times the logarithm of the (a) BFVQ and (b) VQ test statistics, plot against the number of violations,
+%under the null hypothesis (black circles) and the HS quantile estimator (grey triangles) at $n=1000$.
+%The horizontal lines are two times the logarithm of the empirical 5\% points of the BFVQ (a) and VQR (b) statistics.}
+%\end{figure}
+
+
+
+\section{Empirical study}
+We briefly report the results of a large empirical study here. Seven daily financial time series: prices, exchange rates or
+financial indices, are considered, in each case converting these to daily percentage log returns. The seven series are: the US
+S\&P500 index, the AORD, FTSE100 and Hang Seng indices, the AU US exchange rates, the EU US exchange rates and IBM asset prices.
+The initial sample period is specifically from January 2, 1998 to December 15, 2005, approximately 2000 days in each case. The forecast
+period is December 16, 2005 to January 15, 2010, covering close to 1000 trading days in each market, and including the well-known
+global financial crisis (GFC) period.
+
+One-step-ahead forecasts of VaR at 5\% and 1\% quantile levels are estimated under a range of competing models and methods, for each day in
+the forecast period. Forecasts for each of four types of heteroskedastic model: the GARCH of Bollerslev (1986), the GJR-GARCH of
+Glosten et al (1993) the Threshold (T-)GARCH in Chen, Gerlach and So (2006) and a smooth transition (ST-)GARCH as in Chen and Gerlach (2008)
+are estimated employing the MCMC methods of Chen et al. (2012). Each of these specifications is estimated under five types of error
+distribution: Gaussian, Student-t, the skewed Student-t of Hansen (1994), the Asymmetric Laplace (AL) of Chen et al (2012) and the
+Two-sided Weibull (TW) of Chen and Gerlach (2013). This gives 20 models generating VaR forecasts at 5\% and 1\% quantile levels for 1000 days.
+Each day's forecast used the last $\sim 2000$ days as the estimation period for each model, thus a rolling window approach is used.
+Also considered are the non-parametric 50 day and 250 day sample percentile HS methods, thus giving a total of 22 models or methods.
+Estimation results are not shown to save space, since only the test results are directly relevant to this paper; it is expected that most models
+and methods will be rejected since the data includes the GFC period, where that outcome is common;
+but models and methods that can better captured highly changing volatility and fat-tailed returns will be rejected the least,
+across the seven series.
+
+Tables \ref{reject5} and \ref{reject1} show the number of series, out of 7, that each model or method of VaR estimation was rejected in,
+using the DQ1, DQ4, BFDQ1, BFDQ4, VBDQ, VQR, BFVQ and VBVQ tests for 5\% and 1\% VaR forecasting, respectively.
+The tests were conducted at the 5\% level using the empirical cut-offs in Tables \ref{size5}-\ref{size11} above.
+
+\begin{table}
+\begin{center}
+\caption{Number of rejections for each model across 7 series for 1\% VaR forecasting.}\label{reject5}
+\begin{tabular}{lcccccccc}
+\hline
+    Method &    DQ1 &    DQ4 &  BFDQ1 &  BFDQ4 &   VBDQ &   VQ   &   BFVQ &   VBVQ   \\ \hline
+       G-n &      6 &      5 &\fbox{0}&      1 &      3 &      2 &      4 &      4   \\
+     GJR-n &      4 &      5 &\fbox{0}&\fbox{0}&      4 &      4 &      5 &      6   \\
+      TG-n &      6 &      5 &      1 &\fbox{0}&      4 &      3 &      5 &      5   \\
+      ST-n &      6 &      6 &      1 &\fbox{0}&      5 &      4 &      6 &      6   \\
+       G-t &      1 &      3 &      1 &      3 &\fbox{0}&      2 &      1 &      1   \\
+     GJR-t &\fbox{0}&\fbox{0}&\fbox{0}&      2 &      1 &      1 &      1 &      2   \\
+     TG-t  &\fbox{0}&\fbox{0}&      1 &      2 &      1 &      1 &      2 &      2   \\
+      ST-t &      2 &      1 &      1 &      2 &\fbox{0}&      2 &      2 &      2   \\
+     G-SKT &      1 &      1 &\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}&      1 &      1   \\
+   GJR-SKT &      1 &      1 &\fbox{0}&\fbox{0}&\fbox{0}&      1 &      1 &      1  \\
+    TG-SKT &      1 &      1 &\fbox{0}&      1 &\fbox{0}&\fbox{0}&      2 &      2   \\
+    ST-SKT &      1 &      1 &\fbox{0}&\fbox{0}&\fbox{0}&      1 &      2 &      2   \\
+      G-AL &      1 &      2 &      2 &      4 &      1 &      3 &      3 &      3   \\
+    GJR-AL &      1 &      2 &      2 &      1 &      1 &      5 &\cred{7}&      6   \\
+     TG-AL &      1 &      2 &      3 &      2 &      1 &      5 &      5 &      4   \\
+     ST-AL &      1 &      2 &      2 &      2 &      1 &      2 &      4 &      4   \\
+      G-TW &      1 &\fbox{0}&\fbox{0}&      1 &\fbox{0}&      1 &      1 &      1   \\
+    GJR-TW &\fbox{0}&\fbox{0}&      1 &      1 &      2 &      1 &      2 &      2   \\
+     TG-TW &      1 &\fbox{0}&\fbox{0}&      2 &\fbox{0}&      1 &      1 &      1   \\
+     ST-TW &      1 &\fbox{0}&\fbox{0}&      2 &\fbox{0}&\fbox{0}&      1 &      1   \\
+     HS250 &\cred{7}&\cred{7}&      3 &      6 &\cred{7}&      5 &\cred{7}&\cred{7}   \\
+      HS50 &\cred{7}&\cred{7}&\cred{7}&      3 &\cred{7}&\cred{7}&\cred{7}&\cred{7}  \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+For 1\% VaR forecasting, the various tests often have quite different numbers of rejections for each model. The DQ tests reject all
+models with Gaussian errors in most series, as do the VBDQ, BFVQ and VBVQ tests; however, the BFDQ tests seem to have lower power
+at rejecting these, perhaps reflecting their comparatively low power in the simulation study. A similar result occurred for
+the HS methods, where the VBDQ and VBVQ also rejected these in all 7 series. Broadly in agreement with Chen et al (2012),
+the HS and models with Gaussian errors can be rejected as adequate 1\% VaR forecasters, whilst models with TW and SKT errors are
+rejected the least across the various tests, and thus seem most suitable and accurate as 1\% VaR forecasters for these series.
+
+
+For 5\% VaR forecasting, the results are qualitatively similar. One difference is that models with Gaussian errors are rejected
+less frequently for 5\% VaR forecasting; whilst models with AL errors are added to those that are rejected only in a few of the series,
+across the various tests.
+
+\begin{table}
+\begin{center}
+\caption{Number of rejections for each model across 7 series for 5\% VaR forecasting.}\label{reject1}
+\begin{tabular}{lccccccccc}
+\hline
+    Method &    DQ1 &    DQ4 &  BFDQ1 &  BFDQ4 &   VBDQ &   VQ   &   BFVQ &   VBVQ   \\ \hline
+       G-n &\fbox{0}&      3 &\fbox{0}&      1 &\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}  \\
+     GJR-n &      2 &      3 &\fbox{0}&      1 &      1 &      1 &      2 &      2   \\
+      TG-n &      3 &      3 &      1 &      1 &      1 &      2 &      2 &      2   \\
+      ST-n &      3 &      3 &      1 &      1 &      1 &      1 &      2 &      3   \\
+       G-t &      1 &      3 &      1 &      3 &      1 &      2 &      2 &      1   \\
+     GJR-t &      1 &      2 &      1 &      2 &      1 &      1 &      1 &      1   \\
+      TG-t &      1 &      2 &      1 &      2 &      1 &      2 &      1 &      1   \\
+      ST-t &      1 &      2 &      1 &      2 &      1 &      3 &      1 &      1   \\
+     G-SKT &\fbox{0}&      3 &\fbox{0}&      1 &\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}  \\
+   GJR-SKT &      1 &      3 &\fbox{0}&\fbox{0}&\fbox{0}&      1 &\fbox{0}&\fbox{0}  \\
+    TG-SKT &      2 &      3 &\fbox{0}&\fbox{0}&\fbox{0}&      2 &      1 &      3     \\
+    ST-SKT &      1 &      3 &\fbox{0}&\fbox{0}&\fbox{0}&      1 &      1 &      2     \\
+      G-AL &\fbox{0}&      2 &\fbox{0}&      2 &\fbox{0}&      1 &\fbox{0}&\fbox{0}   \\
+    GJR-AL &      1 &      2 &      1 &      1 &\fbox{0}&      1 &      1 &\fbox{0}   \\
+     TG-AL &\fbox{0}&      2 &      1 &      1 &\fbox{0}&      1 &      1 &      1     \\
+     ST-AL &\fbox{0}&      2 &\fbox{0}&      1 &\fbox{0}&      1 &\fbox{0}&      1     \\
+      G-TW &\fbox{0}&      2 &\fbox{0}&      1 &\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}     \\
+    GJR-TW &\fbox{0}&      2 &\fbox{0}&      1 &\fbox{0}&\fbox{0}&\fbox{0}&      1     \\
+     TG-TW &\fbox{0}&      2 &\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}&\fbox{0}&      1     \\
+     ST-TW &      1 &      2 &\fbox{0}&\fbox{0}&\fbox{0}&      1 &\fbox{0}&\fbox{0}     \\
+     HS250 &\cred{7}&      6 &\cred{7}&\cred{7}&\cred{7}&\cred{7}&\cred{7}&\cred{7}     \\
+     HS50  &      6 &      5 &\cred{7}&\cred{7}&      6 &\cred{7}&\cred{7}&\cred{7}   \\  \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\section{Conclusion}
+Two variational Bayes methods are developed for assessing and testing forecast accuracy for dynamic quantile forecasts. The
+tests are analogues of the VQR and DQ tests commonly applied in this area. The proposed methods do not depend on the
+estimation technique, nor on the model or method used, to generate the quantile forecasts.
+In a simulation study, at both $\alpha=0.01, 0.05$ quantile levels, these methods performed favourably, regarding
+size-adjusted power, compared to their competing Bayesian and frequentist analogues.
+
+\vspace{3cm}
+
+
+\noindent{\bf Acknowledgement}
+The authors thank Declan Walpole for coding up the VQR test.
+
+\newpage
+\noindent{\bf References}
+
+\begin{description}
+\item
+Berkowitz, J., Christoffersen, P., and Pelletier, D. (2011), ``Evaluating Value-at-Risk Models with Desk-Level Data,''
+{\em Management Science}, {\bf 57}, 2213-2227.
+
+\item Bollerslev, T. (1986). ``Generalized Autoregressive Conditional Heteroskedasticity,'' {\em Journal of Econometrics},
+{\bf 31}, 307-327.
+
+\item Brown, L. D., Cai, T. T., and DasGupta, A. (2001) ``Interval Estimation for a Binomial Proportion,''
+{\em Statistical Science}, {\bf 16}, 101-117.
+
+\item Chen, C. W. S., Gerlach, R., Hwang, R. B. K., and McAleer, M. (2012), ``Forecasting Value-at-Risk
+using nonlinear regression quantiles and the intra-day range,'' {\em International Journal of Forecasting}, {\bf 28}, 557-574.
+
+\item
+Chen, C. W. S., Gerlach, R., Lin, E. M. H., and Lee, W.C.W. (2012), ``Bayesian forecasting for financial risk management, pre and post the
+global financial crisis,'' {\em Journal of Forecasting}, {\bf 31}, 661-687.
+
+\item
+Chen, C. W. S., and  So, M. K. P. (2006). ``On a threshold heteroscedastic model,'' {\em International Journal of Forecasting}, {\bf 22},
+73-89.
+
+\item
+Chen, Q., and Gerlach, R. (2013). ``The two-sided Weibull distribution and forecasting financial tail risk,''
+{\em International Journal of Forecasting}, {\bf 29}, 527-540.
+
+\item
+Chen, Q., Gerlach, R. and Lu, Z. (2012), ``Bayesian Value-at-Risk and expected shortfall forecasting via the asymmetric
+Laplace distribution,'' {\em Computational Statistics \& Data Analysis}, 1st Issue of Annals of Computational and Financial
+Econometrics, {\bf 56}, 3498-3516.
+
+\item Christoffersen, P. F. (1998), ``Evaluating interval forecasts,'' {\em International Economic Review}, {\bf39}, 841-862.
+
+\item Engle R. F., and Manganelli S. (2004), ``CAViaR: Conditional autoregressive value at risk by regression quantiles,''
+{\em Journal of Business and Economic Statistic}, {\bf 22}, 367- 381.
+
+\item Gaglianone, W. P., Lima, L. R., Linton, O., and Smith, D. R. (2011), ``Evaluating Value-at-Risk models via quantile regression,''
+    {\em Journal of Business \& Economic Statistics}, {\bf 29}, 150-160.
+
+\item
+Gelman, A., Carlin, J. B., Stern, H. S., and Rubin, D. B. (2005), Bayesian Data Analysis (2nd ed.), Boca Raton, FL: Chapman \& Hall.
+
+\item Gerlach, R., and Chen, C. W. S. (2008), ``Bayesian inference and model comparison for asymmetric smooth transition
+   heteroskedastic models,'' {\em Statistics and Computing}, {\bf 18}, 391-408.
+
+\item  Gerlach, R., Chen, C.W.S and Lin EMH (2014), ``Bayesian Assessment of Dynamic Quantile Forecasts'', The University of
+    Sydney Business Analytics Working Paper Series, http://sydney.edu.au/business/business_analytics/research/working_papers.
+
+\item
+Girolami, M. and Rogers, S. (2006) ``Variational Bayesian multinomial probit regression with Gaussian process priors,''
+{\em Neural Computation} 18, {\bf 8}, 1790-1817.
+
+\item Glosten, L. R., Jagannathan, R., and Runkle, D. E. (1993). ``On the relation between the expected value and the volatility
+of the nominal excess return on stocks,'' {\em Journal of Finance}, {\bf 487}, 1779-1801.
+
+\item Hansen, B., (1994). ``Autoregressive conditional density estimation,'' {\em International Economic Review}. {\bf 35}, 705–730.
+
+\item Hoogerheide, L. F., and van Dijk, H.K. (2010), ``Bayesian forecasting of Value at Risk and expected shortfall using
+adaptive importance sampling", {\em International Journal of Forecasting}, {\bf 26}, 231-247.
+
+\item
+Koenker, R., and Machado, J. A. F. (1999) ``Goodness of fit and related inference for quantile regression,'' {\em Journal of the American
+Statistical Association}, {\bf 94}, 1296-1310.
+
+\item
+Kupiec, P. (1995) ``Techniques for verifying the accuracy of risk measurement models,'' {\em Journal of Derivatives},
+{\bf 2}, 173-84.
+
+\item
+Ormerod, J. and Wand, M. (2010) ``Explaining variational approximations,'' {\em American Statistician}, 64, {\bf 2}, 140-153.
+
+\item
+Smith, M., and Kohn, R. (1996). ``Non-parametric Regression Using Bayesian Variable Selection,'' {\em Journal of Econometrics},
+{\bf 75}, 317-343.
+
+\item
+Tzikas, D., Likas, A.  and Galatsanos, N. ``Variational Bayesian sparse kernel-based blind image deconvolution with student's-t priors,'' IEEE Transactions on Image Processing, vol. 18, no. 4, pp. 753-764.
+
+\item Tuyl, F., and Gerlach, R., and Mengersen, K. (2008). ``Inference for Proportions in a 2 x 2 Contingency Table: HPD or not HPD?,''
+{\em Biometrics}, {\bf 64}, 1293-1296.
+
+
+
+\end{description}
+
+\input{appendix_030715}
+
+\end{document}
